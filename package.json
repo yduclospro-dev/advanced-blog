@@ -11,8 +11,10 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@prisma/client": "^6.18.0",
     "@testing-library/user-event": "^14.6.1",
     "bcryptjs": "^3.0.2",
+    "dotenv": "^17.2.3",
     "express": "^5.1.0",
     "jest": "^30.2.0",
     "next": "16.0.0",
@@ -31,6 +33,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.0.0",
     "jest-environment-jsdom": "^30.2.0",
+    "prisma": "^6.18.0",
     "tailwindcss": "^4",
     "typescript": "^5"
   }
