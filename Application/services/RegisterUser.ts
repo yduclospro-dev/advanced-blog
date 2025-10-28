@@ -13,12 +13,15 @@ export class RegisterUser {
   async execute(userName: string, email: string, password: string): Promise<User> {
     const existing = await this.userRepository.findByEmail(email);
     if (existing) {
-      throw new Error("Email already in use");
+      throw new Error("L'email de l'utilisateur existe déjà");
     }
     const user = new User("", userName, email, password);
     if (!user.isPasswordValid()) {
       throw new Error("Le mot de passe doit contenir au moins 6 caractères");
     }
+
+    console.log("USER TO REGISTER: ", user);
+
     const hashedPassword = await bcrypt.hash(password, 10);
     user.setPassword(hashedPassword);
     return await this.userRepository.create(user);

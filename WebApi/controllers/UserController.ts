@@ -1,4 +1,3 @@
-import express from "express";
 import type { Request, Response } from "express";
 import { UserRepository } from "../../Infrastructure/repositories/UserRepository.ts";
 import { RegisterUser } from "../../Application/services/RegisterUser.ts";
@@ -12,9 +11,10 @@ export class UserController {
   }
 
   async register(req: Request, res: Response) {
+    console.log("BODY: ", req.body)
     const { username, email, password } = req.body;
     if (!username || !email || !password) {
-      return res.status(400).json({ error: "Missing required fields" });
+      return res.status(400).json({ error: "Champs requis manquants" });
     }
 
     try {
@@ -26,7 +26,7 @@ export class UserController {
         password: user.password
       });
     } catch {
-      res.status(400).json({ error: "User registration failed" });
+      res.status(400).json({ error: "Echec de l'enregistrement de l'utilisateur" });
     }
   }
 }

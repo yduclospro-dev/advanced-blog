@@ -1,6 +1,7 @@
 import { create, StateCreator } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import { User } from "@/types/User";
+import axios from "axios";
 
 interface AuthUser {
   id: string;
@@ -70,32 +71,22 @@ const userStoreCreator: StateCreator<UserState, [], [], UserState> = (set, get) 
   },
 
   register: async (username: string, email: string, password: string) => {
-    const trimmedUsername = username.trim();
-    const trimmedEmail = email.trim();
-    const trimmedPassword = password.trim();
-
-    if (!trimmedUsername || !trimmedEmail || !trimmedPassword) {
-      return { success: false, error: 'Tous les champs sont obligatoires' };
+    try {
+      const response = await axios.post('/api/register', {
+        username,
+        email,
+        password
+      });
+      if (response.status !== 201 && response.status !== 200) {
+        return { success: false, error: response.data?.error || "Erreur lors de l'inscription" };
+      }
+      return { success: true };
+    } catch (err: unknown) {
+      if (axios.isAxiosError(err)) {
+        return { success: false, error: err.response?.data?.error };
+      }
+      return { success: false, error: "Erreur réseau ou serveur" };
     }
-
-    if (trimmedPassword.length < 6) {
-      return { success: false, error: 'Le mot de passe doit contenir au moins 6 caractères' };
-    }
-
-    if (get().checkIfUsernameOrEmailExists(trimmedUsername, trimmedEmail)) {
-      return { success: false, error: "Le nom d'utilisateur ou l'email existe déjà" };
-    }
-
-    const newUser: User = {
-      id: crypto.randomUUID(),
-      username: trimmedUsername,
-      email: trimmedEmail,
-      password: trimmedPassword
-    };
-
-    get().addUser(newUser);
-
-    return { success: true };
   }
 });
 
