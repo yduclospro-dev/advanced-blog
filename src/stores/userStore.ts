@@ -43,31 +43,28 @@ const userStoreCreator: StateCreator<UserState, [], [], UserState> = (set, get) 
     get().users.some(user => user.username === username || user.email === email),
 
   login: async (email: string, password: string) => {
-    const users = get().users;
-    
-    const trimmedEmail = email.trim();
-    const trimmedPassword = password.trim();
-    
-    const user = users.find(u => u.email === trimmedEmail && u.password === trimmedPassword);
+    try {
+      const response = await axios.post('/api/login', { email, password });
 
-    if (!user) {
-      return { success: false, error: 'Email ou mot de passe incorrect' };
+      if (response.status !== 200) {
+        return { success: false, error: response.data?.error || "Erreur lors de la connexion" };
+      }
+
+      set({
+        isAuthenticated: true
+      });
+
+      return { success: true };
+    } catch (err: unknown) {
+      if (axios.isAxiosError(err)) {
+        return { success: false, error: err.response?.data?.error };
+      }
+      return { success: false, error: "Erreur réseau ou serveur" };
     }
-
-    set({
-      currentUser: {
-        id: user.id,
-        email: user.email,
-        username: user.username
-      },
-      isAuthenticated: true
-    });
-
-    return { success: true };
   },
 
   logout: () => {
-    set({ currentUser: null, isAuthenticated: false });
+    set({ isAuthenticated: false });
   },
 
   register: async (username: string, email: string, password: string) => {
