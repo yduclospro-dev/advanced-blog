@@ -2,7 +2,11 @@ import { Article } from "../../Domain/entities/Article.ts";
 import type { IArticleRepository } from "../../Domain/repositories/IArticleRepository.ts";
 
 export class UpdateArticle {
-  constructor(private articleRepository: IArticleRepository) {}
+  private articleRepository: IArticleRepository;
+
+  constructor(articleRepository: IArticleRepository) {
+    this.articleRepository = articleRepository;
+  }
 
   async execute(
     id: string,

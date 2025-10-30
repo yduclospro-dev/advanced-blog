@@ -2,12 +2,15 @@ import { Article } from "../../Domain/entities/Article.ts";
 import type { IArticleRepository } from "../../Domain/repositories/IArticleRepository.ts";
 
 export class CreateArticle {
-  constructor(private articleRepository: IArticleRepository) {}
+  private articleRepository: IArticleRepository;
+
+  constructor(articleRepository: IArticleRepository) {
+    this.articleRepository = articleRepository;
+  }
 
   async execute(
     title: string,
     author: string,
-    authorId: string,
     content: string,
     imageUrl?: string
   ): Promise<Article> {
@@ -15,11 +18,9 @@ export class CreateArticle {
       "",
       title,
       author,
-      authorId,
+      "", // authorId sera rempli par le repository
       new Date().toISOString().split("T")[0],
       content,
-      [],
-      [],
       imageUrl
     );
 

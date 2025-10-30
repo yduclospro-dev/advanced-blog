@@ -15,7 +15,7 @@ datasource db {
 
 model User {
   id        String   @id @default(uuid())
-  userName  String
+  userName  String   @unique
   email     String   @unique
   password  String
   articles  Article[]
@@ -24,11 +24,8 @@ model User {
 model Article {
   id        String   @id @default(uuid())
   title     String
-  author    String
   authorId  String
-  date      DateTime @default(now())
   content   String
-  likes     String[]
-  dislikes  String[]
+  date      DateTime @default(now())
   user      User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
 }
