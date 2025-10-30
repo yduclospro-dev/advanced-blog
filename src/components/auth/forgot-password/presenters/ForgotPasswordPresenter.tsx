@@ -8,6 +8,7 @@ interface ForgotPasswordPresenterProps {
   emailSent: boolean;
   onEmailChange: (value: string) => void;
   onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
+  onResend: () => void;
 }
 
 export default function ForgotPasswordPresenter({
@@ -16,6 +17,7 @@ export default function ForgotPasswordPresenter({
   emailSent,
   onEmailChange,
   onSubmit,
+  onResend,
 }: ForgotPasswordPresenterProps) {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-slate-900 dark:to-slate-800 p-4 transition-colors">
@@ -88,8 +90,9 @@ export default function ForgotPasswordPresenter({
                   variant="outline"
                   size="md"
                   fullWidth
-                  onClick={() => window.location.reload()}
-                  label="Renvoyer le lien"
+                  disabled={isLoading}
+                  onClick={onResend}
+                  label={isLoading ? "Envoi en cours..." : "Renvoyer le lien"}
                 />
                 <Link 
                   href="/login" 

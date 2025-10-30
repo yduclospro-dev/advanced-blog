@@ -47,6 +47,27 @@ export default function ForgotPasswordContainer() {
     }
   };
 
+  const handleResend = async () => {
+    setToast(null);
+    setIsLoading(true);
+
+    try {
+      await axios.post("/api/password/forgot", { email });
+      
+      setToast({ 
+        message: "Un nouveau lien de réinitialisation a été envoyé.", 
+        type: "success" 
+      });
+    } catch (error) {
+      setToast({ 
+        message: "Une erreur est survenue. Veuillez réessayer.", 
+        type: "error" 
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <>
       <ForgotPasswordPresenter
@@ -55,6 +76,7 @@ export default function ForgotPasswordContainer() {
         emailSent={emailSent}
         onEmailChange={setEmail}
         onSubmit={handleSubmit}
+        onResend={handleResend}
       />
       {toast && (
         <Toast
