@@ -12,7 +12,7 @@ export class EmailService {
     try {
       const result = await resend.emails.send({
         from: "onboarding@resend.dev",
-        to: "delivered@resend.dev", // Sandbox mode: can only send to this address
+        to: "delivered@resend.dev", 
         subject: "Réinitialisation de votre mot de passe",
         html: `
           <!DOCTYPE html>

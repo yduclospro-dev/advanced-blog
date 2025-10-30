@@ -35,7 +35,6 @@ export class User {
   generateResetToken(): string {
     const token = crypto.randomBytes(32).toString("hex");
     this.resetPasswordToken = token;
-    // Token expires in 1 hour
     this.resetPasswordExpires = new Date(Date.now() + 3600000);
     return token;
   }

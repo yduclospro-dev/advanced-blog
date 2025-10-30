@@ -14,7 +14,6 @@ apiRouter.get('/status', (req, res) => {
 apiRouter.post('/register', userController.register.bind(userController));
 apiRouter.post('/login', userController.login.bind(userController));
 
-// Password reset routes
 apiRouter.post('/password/forgot', passwordController.forgotPassword.bind(passwordController));
 apiRouter.post('/password/reset', passwordController.resetPassword.bind(passwordController));
 
