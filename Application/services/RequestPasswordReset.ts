@@ -19,10 +19,14 @@ export class RequestPasswordReset {
 
     const resetToken = user.generateResetToken();
 
+    if (!user.resetPasswordExpires) {
+      throw new Error("Reset password expiry was not set by generateResetToken().");
+    }
+
     await this.userRepository.updateResetToken(
       user.id,
       resetToken,
-      user.resetPasswordExpires!
+      user.resetPasswordExpires
     );
 
     await this.emailService.sendPasswordResetEmail(email, resetToken);
