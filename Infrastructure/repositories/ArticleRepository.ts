@@ -6,7 +6,6 @@ const prisma = new PrismaClient();
 
 export class ArticleRepository implements IArticleRepository {
   async create(article: Article): Promise<Article> {
-    // Récupérer l'utilisateur par son nom pour obtenir son ID
     const user = await prisma.user.findUnique({
       where: { userName: article.author },
     });
@@ -104,24 +103,6 @@ export class ArticleRepository implements IArticleRepository {
 
   async delete(id: string): Promise<void> {
     await prisma.article.delete({ where: { id } });
-  }
-
-  async toggleLike(articleId: string, userId: string): Promise<Article> {
-    // Les likes seront gérés côté client (localStorage)
-    const article = await this.findById(articleId);
-    if (!article) {
-      throw new Error('Article non trouvé');
-    }
-    return article;
-  }
-
-  async toggleDislike(articleId: string, userId: string): Promise<Article> {
-    // Les dislikes seront gérés côté client (localStorage)
-    const article = await this.findById(articleId);
-    if (!article) {
-      throw new Error('Article non trouvé');
-    }
-    return article;
   }
 }
 

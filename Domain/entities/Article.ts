@@ -25,34 +25,6 @@ export class Article {
     this.imageUrl = imageUrl;
   }
 
-  // toggleLike(userId: string): void {
-  //   const hasLiked = this.likes.includes(userId);
-  //   const hasDisliked = this.dislikes.includes(userId);
-
-  //   if (hasLiked) {
-  //     this.likes = this.likes.filter((id) => id !== userId);
-  //   } else {
-  //     this.likes.push(userId);
-  //     if (hasDisliked) {
-  //       this.dislikes = this.dislikes.filter((id) => id !== userId);
-  //     }
-  //   }
-  // }
-
-  // toggleDislike(userId: string): void {
-  //   const hasLiked = this.likes.includes(userId);
-  //   const hasDisliked = this.dislikes.includes(userId);
-
-  //   if (hasDisliked) {
-  //     this.dislikes = this.dislikes.filter((id) => id !== userId);
-  //   } else {
-  //     this.dislikes.push(userId);
-  //     if (hasLiked) {
-  //       this.likes = this.likes.filter((id) => id !== userId);
-  //     }
-  //   }
-  // }
-
   isValidForCreation(): boolean {
     return (
       this.title.trim().length > 0 &&

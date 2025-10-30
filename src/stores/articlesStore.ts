@@ -26,7 +26,6 @@ export const useArticleStore = create<ArticleStore>()((set, get) => ({
     isLoading: false,
     error: null,
 
-    // Récupérer tous les articles depuis l'API
     fetchArticles: async () => {
         set({ isLoading: true, error: null });
         try {
@@ -34,7 +33,6 @@ export const useArticleStore = create<ArticleStore>()((set, get) => ({
             if (!response.ok) throw new Error("Erreur lors de la récupération des articles");
             const articles = await response.json();
             
-            // Ajouter likes et dislikes depuis localStorage pour chaque article
             const articlesWithLikes = articles.map((article: Article) => ({
                 ...article,
                 likes: JSON.parse(localStorage.getItem(`article-${article.id}-likes`) || "[]"),
@@ -56,7 +54,6 @@ export const useArticleStore = create<ArticleStore>()((set, get) => ({
         return sorted.slice(0, limit);
     },
 
-    // Créer un article via l'API
     addArticle: async (articleData) => {
         set({ isLoading: true, error: null });
         try {
@@ -93,7 +90,6 @@ export const useArticleStore = create<ArticleStore>()((set, get) => ({
         }
     },
 
-    // Mettre à jour un article via l'API
     updateArticle: async (id, updatedData) => {
         set({ isLoading: true, error: null });
         try {
@@ -128,7 +124,6 @@ export const useArticleStore = create<ArticleStore>()((set, get) => ({
         }
     },
 
-    // Supprimer un article via l'API
     deleteArticle: async (id) => {
         set({ isLoading: true, error: null });
         try {
@@ -138,7 +133,6 @@ export const useArticleStore = create<ArticleStore>()((set, get) => ({
 
             if (!response.ok) throw new Error("Erreur lors de la suppression de l'article");
 
-            // Supprimer aussi les likes/dislikes du localStorage
             localStorage.removeItem(`article-${id}-likes`);
             localStorage.removeItem(`article-${id}-dislikes`);
 
@@ -152,7 +146,6 @@ export const useArticleStore = create<ArticleStore>()((set, get) => ({
         }
     },
 
-    // Likes/Dislikes gérés en localStorage (non persistés en base)
     toggleArticleLike: (articleId, userId) => {
         set({
             articles: get().articles.map((article) => {
@@ -168,7 +161,6 @@ export const useArticleStore = create<ArticleStore>()((set, get) => ({
                     ? article.dislikes?.filter(id => id !== userId) || []
                     : article.dislikes || [];
 
-                // Sauvegarder dans localStorage
                 localStorage.setItem(`article-${articleId}-likes`, JSON.stringify(newLikes));
                 localStorage.setItem(`article-${articleId}-dislikes`, JSON.stringify(newDislikes));
 
@@ -196,7 +188,6 @@ export const useArticleStore = create<ArticleStore>()((set, get) => ({
                     ? article.dislikes?.filter(id => id !== userId) || []
                     : [...(article.dislikes || []), userId];
 
-                // Sauvegarder dans localStorage
                 localStorage.setItem(`article-${articleId}-likes`, JSON.stringify(newLikes));
                 localStorage.setItem(`article-${articleId}-dislikes`, JSON.stringify(newDislikes));
 

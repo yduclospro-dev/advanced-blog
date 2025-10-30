@@ -41,11 +41,9 @@ export class ArticleController {
   }
 
   async create(req: Request, res: Response) {
-    console.log("📥 Requête reçue pour créer un article:", req.body);
     const { title, author, content, imageUrl } = req.body;
 
     if (!title || !author || !content) {
-      console.log("❌ Champs manquants - title:", !!title, "author:", !!author, "content:", !!content);
       return res.status(400).json({ error: "Champs requis manquants: title, author, et content sont obligatoires" });
     }
 
@@ -56,10 +54,9 @@ export class ArticleController {
         content,
         imageUrl
       );
-      console.log("✅ Article créé avec succès:", createdArticle);
       res.status(201).json(createdArticle);
     } catch (error) {
-      console.error("❌ Erreur lors de la création de l'article:", error);
+      console.error("Erreur lors de la création de l'article:", error);
       res.status(500).json({ error: "Erreur lors de la création de l'article" });
     }
   }
@@ -100,40 +97,6 @@ export class ArticleController {
       }
       
       res.status(500).json({ error: "Erreur lors de la suppression de l'article" });
-    }
-  }
-
-  async toggleLike(req: Request, res: Response) {
-    const { id } = req.params;
-    const { userId } = req.body;
-
-    if (!userId) {
-      return res.status(400).json({ error: "userId est requis" });
-    }
-
-    try {
-      const updatedArticle = await this.articleRepository.toggleLike(id, userId);
-      res.status(200).json(updatedArticle);
-    } catch (error) {
-      console.error("Erreur lors du like de l'article:", error);
-      res.status(500).json({ error: "Erreur lors du like de l'article" });
-    }
-  }
-
-  async toggleDislike(req: Request, res: Response) {
-    const { id } = req.params;
-    const { userId } = req.body;
-
-    if (!userId) {
-      return res.status(400).json({ error: "userId est requis" });
-    }
-
-    try {
-      const updatedArticle = await this.articleRepository.toggleDislike(id, userId);
-      res.status(200).json(updatedArticle);
-    } catch (error) {
-      console.error("Erreur lors du dislike de l'article:", error);
-      res.status(500).json({ error: "Erreur lors du dislike de l'article" });
     }
   }
 }
