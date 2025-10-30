@@ -10,12 +10,13 @@ export class EmailService {
     const resetUrl = `${process.env.RESET_PASSWORD_URL || "http://localhost:3000/reset-password"}?token=${resetToken}`;
 
     try {
-      await resend.emails.send({
+      const result = await resend.emails.send({
         from: "onboarding@resend.dev",
-        to: email,
+        to: "delivered@resend.dev", // Sandbox mode: can only send to this address
         subject: "Réinitialisation de votre mot de passe",
         html: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+            <p><strong>Email destiné à:</strong> ${email}</p>
             <h2>Réinitialisation de votre mot de passe</h2>
             <p>Vous avez demandé la réinitialisation de votre mot de passe.</p>
             <p>Cliquez sur le lien ci-dessous pour réinitialiser votre mot de passe :</p>
@@ -27,11 +28,12 @@ export class EmailService {
             <hr style="margin: 30px 0; border: none; border-top: 1px solid #eee;">
             <p style="color: #666; font-size: 12px;">
               Si le bouton ne fonctionne pas, copiez et collez ce lien dans votre navigateur :<br>
-              ${resetUrl}
+              <strong>${resetUrl}</strong>
             </p>
           </div>
         `,
       });
+      console.log("Email sent successfully:", result);
     } catch (error) {
       console.error("Failed to send password reset email:", error);
       throw new Error("Failed to send password reset email");
