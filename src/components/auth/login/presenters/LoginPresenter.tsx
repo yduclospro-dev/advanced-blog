@@ -60,6 +60,15 @@ export default function LoginPresenter({
               disabled={isLoading}
             />
 
+            <div className="flex justify-end">
+              <Link 
+                href="/forgot-password" 
+                className="text-sm text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 transition-colors"
+              >
+                Mot de passe oublié ?
+              </Link>
+            </div>
+
             {successMessage && (
               <p className="text-green-600 dark:text-green-400 text-sm font-medium text-center bg-green-50 dark:bg-green-900/20 p-3 rounded-lg">
                 {successMessage}

@@ -4,7 +4,7 @@ export const variantStyles: Record<ButtonVariant, string> = {
   primary: 'bg-gradient-to-r from-sky-500 to-blue-600 text-white hover:from-sky-600 hover:to-blue-700 shadow-xl shadow-sky-500/30',
   secondary: 'bg-white/60 backdrop-blur-md border border-gray-200 text-gray-900 hover:bg-white/80',
   danger: 'bg-red-600 text-white hover:bg-red-700 shadow-lg hover:shadow-xl',
-  outline: 'border-2 border-gray-400 text-gray-600 hover:bg-gray-100',
+  outline: 'border-2 border-gray-300 dark:border-slate-600 text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-800 hover:border-gray-400 dark:hover:border-slate-500',
   ghost: 'text-blue-600 hover:text-blue-800 hover:bg-blue-50',
   success: 'bg-green-600 text-white hover:bg-green-700 shadow-lg',
 };
