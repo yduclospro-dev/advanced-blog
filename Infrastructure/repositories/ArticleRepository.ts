@@ -6,26 +6,33 @@ const prisma = new PrismaClient();
 
 export class ArticleRepository implements IArticleRepository {
   async create(article: Article): Promise<Article> {
+    // Récupérer l'utilisateur par son nom pour obtenir son ID
+    const user = await prisma.user.findUnique({
+      where: { userName: article.author },
+    });
+
+    if (!user) {
+      throw new Error(`Utilisateur '${article.author}' introuvable`);
+    }
+
     const created = await prisma.article.create({
       data: {
         title: article.title,
-        author: article.author,
-        authorId: article.authorId,
+        authorId: user.id,
         content: article.content,
-        likes: article.likes,
-        dislikes: article.dislikes,
+      },
+      include: {
+        user: true,
       },
     });
-    
+
     return new Article(
       created.id,
       created.title,
-      created.author,
+      created.user.userName,
       created.authorId,
       created.date.toISOString().split('T')[0],
       created.content,
-      created.likes,
-      created.dislikes,
       article.imageUrl
     );
   }
@@ -35,36 +42,40 @@ export class ArticleRepository implements IArticleRepository {
       orderBy: {
         date: 'desc',
       },
+      include: {
+        user: true,
+      },
     });
-    
+
     return articles.map(
       (a) =>
         new Article(
           a.id,
           a.title,
-          a.author,
+          a.user.userName,
           a.authorId,
           a.date.toISOString().split('T')[0],
-          a.content,
-          a.likes,
-          a.dislikes
+          a.content
         )
     );
   }
 
   async findById(id: string): Promise<Article | null> {
-    const found = await prisma.article.findUnique({ where: { id } });
+    const found = await prisma.article.findUnique({
+      where: { id },
+      include: {
+        user: true,
+      },
+    });
     if (!found) return null;
-    
+
     return new Article(
       found.id,
       found.title,
-      found.author,
+      found.user.userName,
       found.authorId,
       found.date.toISOString().split('T')[0],
-      found.content,
-      found.likes,
-      found.dislikes
+      found.content
     );
   }
 
@@ -74,20 +85,19 @@ export class ArticleRepository implements IArticleRepository {
       data: {
         ...(articleData.title && { title: articleData.title }),
         ...(articleData.content && { content: articleData.content }),
-        ...(articleData.likes && { likes: articleData.likes }),
-        ...(articleData.dislikes && { dislikes: articleData.dislikes }),
+      },
+      include: {
+        user: true,
       },
     });
-    
+
     return new Article(
       updated.id,
       updated.title,
-      updated.author,
+      updated.user.userName,
       updated.authorId,
       updated.date.toISOString().split('T')[0],
       updated.content,
-      updated.likes,
-      updated.dislikes,
       articleData.imageUrl
     );
   }
@@ -97,30 +107,21 @@ export class ArticleRepository implements IArticleRepository {
   }
 
   async toggleLike(articleId: string, userId: string): Promise<Article> {
+    // Les likes seront gérés côté client (localStorage)
     const article = await this.findById(articleId);
     if (!article) {
       throw new Error('Article non trouvé');
     }
-
-    article.toggleLike(userId);
-
-    return this.update(articleId, {
-      likes: article.likes,
-      dislikes: article.dislikes,
-    });
+    return article;
   }
 
   async toggleDislike(articleId: string, userId: string): Promise<Article> {
+    // Les dislikes seront gérés côté client (localStorage)
     const article = await this.findById(articleId);
     if (!article) {
       throw new Error('Article non trouvé');
     }
-
-    article.toggleDislike(userId);
-
-    return this.update(articleId, {
-      likes: article.likes,
-      dislikes: article.dislikes,
-    });
+    return article;
   }
 }
+

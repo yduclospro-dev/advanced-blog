@@ -1,7 +1,11 @@
 import type { IArticleRepository } from "../../Domain/repositories/IArticleRepository.ts";
 
 export class DeleteArticle {
-  constructor(private articleRepository: IArticleRepository) {}
+  private articleRepository: IArticleRepository;
+
+  constructor(articleRepository: IArticleRepository) {
+    this.articleRepository = articleRepository;
+  }
 
   async execute(id: string): Promise<void> {
     const article = await this.articleRepository.findById(id);

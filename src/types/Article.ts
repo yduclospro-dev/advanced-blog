@@ -6,6 +6,6 @@ export interface Article {
     date: string;
     content: string;
     imageUrl?: string;
-    likes: string[];
-    dislikes: string[];
+    likes?: string[];
+    dislikes?: string[];
 }

@@ -21,7 +21,6 @@ apiRouter.get('/articles/:id', articleController.getById.bind(articleController)
 apiRouter.post('/articles', articleController.create.bind(articleController));
 apiRouter.put('/articles/:id', articleController.update.bind(articleController));
 apiRouter.delete('/articles/:id', articleController.delete.bind(articleController));
-apiRouter.post('/articles/:id/like', articleController.toggleLike.bind(articleController));
-apiRouter.post('/articles/:id/dislike', articleController.toggleDislike.bind(articleController));
+
 
 export default apiRouter;

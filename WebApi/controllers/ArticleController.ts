@@ -41,23 +41,25 @@ export class ArticleController {
   }
 
   async create(req: Request, res: Response) {
-    const { title, author, authorId, content, imageUrl } = req.body;
+    console.log("📥 Requête reçue pour créer un article:", req.body);
+    const { title, author, content, imageUrl } = req.body;
 
-    if (!title || !author || !authorId || !content) {
-      return res.status(400).json({ error: "Champs requis manquants" });
+    if (!title || !author || !content) {
+      console.log("❌ Champs manquants - title:", !!title, "author:", !!author, "content:", !!content);
+      return res.status(400).json({ error: "Champs requis manquants: title, author, et content sont obligatoires" });
     }
 
     try {
       const createdArticle = await this.createArticle.execute(
         title,
         author,
-        authorId,
         content,
         imageUrl
       );
+      console.log("✅ Article créé avec succès:", createdArticle);
       res.status(201).json(createdArticle);
     } catch (error) {
-      console.error("Erreur lors de la création de l'article:", error);
+      console.error("❌ Erreur lors de la création de l'article:", error);
       res.status(500).json({ error: "Erreur lors de la création de l'article" });
     }
   }
