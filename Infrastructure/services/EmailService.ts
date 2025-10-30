@@ -7,7 +7,7 @@ export class EmailService {
     email: string,
     resetToken: string
   ): Promise<void> {
-    const resetUrl = `${process.env.RESET_PASSWORD_URL || "http://localhost:3000/reset-password"}?token=${resetToken}`;
+    const resetUrl = `${process.env.RESET_PASSWORD_URL || "http://localhost:3000/reset-password"}?token=${encodeURIComponent(resetToken)}`;
 
     try {
       const result = await resend.emails.send({
