@@ -6,6 +6,4 @@ export interface IArticleRepository {
   findById(id: string): Promise<Article | null>;
   update(id: string, article: Partial<Article>): Promise<Article>;
   delete(id: string): Promise<void>;
-  toggleLike(articleId: string, userId: string): Promise<Article>;
-  toggleDislike(articleId: string, userId: string): Promise<Article>;
 }
