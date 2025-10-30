@@ -50,7 +50,14 @@ const userStoreCreator: StateCreator<UserState, [], [], UserState> = (set, get) 
         return { success: false, error: response.data?.error || "Erreur lors de la connexion" };
       }
 
+      const { user } = response.data;
+
       set({
+        currentUser: {
+          id: user.id,
+          email: user.email,
+          username: user.username
+        },
         isAuthenticated: true
       });
 
@@ -64,7 +71,7 @@ const userStoreCreator: StateCreator<UserState, [], [], UserState> = (set, get) 
   },
 
   logout: () => {
-    set({ isAuthenticated: false });
+    set({ currentUser: null, isAuthenticated: false });
   },
 
   register: async (username: string, email: string, password: string) => {
