@@ -10,5 +10,6 @@ apiRouter.get('/status', (req, res) => {
 });
 
 apiRouter.post('/register', userController.register.bind(userController));
+apiRouter.post('/login', userController.login.bind(userController));
 
 export default apiRouter;
