@@ -2,6 +2,7 @@ import "./globals.css"
 import Navbar from "../components/layout/Nav"
 import Footer from "../components/layout/Footer"
 import { ThemeProvider } from "@/contexts/ThemeContext"
+import { AuthProvider } from "@/components/AuthProvider"
 
 export default function RootLayout({
   children,
@@ -30,15 +31,17 @@ export default function RootLayout({
         />
       </head>
       <body suppressHydrationWarning className="antialiased">
-        <ThemeProvider>
-          <header>
-            <Navbar />
-          </header>
-          <main>
-            {children}
-          </main>
-          <Footer />
-        </ThemeProvider>
+        <AuthProvider>
+          <ThemeProvider>
+            <header>
+              <Navbar />
+            </header>
+            <main>
+              {children}
+            </main>
+            <Footer />
+          </ThemeProvider>
+         </AuthProvider> 
       </body>
     </html>
   )
