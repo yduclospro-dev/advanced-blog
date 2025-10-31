@@ -10,9 +10,9 @@ jest.mock('next/navigation', () => ({
 }))
 
 const mockAddArticle = jest.fn()
-let mockCurrentUser: { id: string; username: string; email: string; password: string } | null = { 
+let mockCurrentUser: { id: string; userName: string; email: string; password: string } | null = { 
   id: 'user1', 
-  username: 'TestUser', 
+  userName: 'TestUser', 
   email: 'test@test.com', 
   password: 'pass' 
 }
@@ -80,7 +80,7 @@ jest.mock('@/components/articles/presenters/NewArticlePresenter', () => ({
 describe('NewArticleContainer', () => {
   beforeEach(() => {
     jest.clearAllMocks()
-    mockCurrentUser = { id: 'user1', username: 'TestUser', email: 'test@test.com', password: 'pass' }
+    mockCurrentUser = { id: 'user1', userName: 'TestUser', email: 'test@test.com', password: 'pass' }
   })
 
   describe('Authentication', () => {
@@ -98,7 +98,7 @@ describe('NewArticleContainer', () => {
 
     it('should render NewArticlePresenter when authenticated', () => {
       // Arrange
-      mockCurrentUser = { id: 'user1', username: 'TestUser', email: 'test@test.com', password: 'pass' }
+      mockCurrentUser = { id: 'user1', userName: 'TestUser', email: 'test@test.com', password: 'pass' }
 
       // Act
       render(<NewArticleContainer />)

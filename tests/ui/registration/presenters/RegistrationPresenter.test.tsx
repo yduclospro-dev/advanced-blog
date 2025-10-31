@@ -36,7 +36,7 @@ jest.mock('@/components/ui', () => ({
 describe('RegistrationPresenter', () => {
   const mockProps = {
     formData: {
-      username: '',
+      userName: '',
       email: '',
       password: ''
     },
@@ -69,7 +69,7 @@ describe('RegistrationPresenter', () => {
     const propsWithData = {
       ...mockProps,
       formData: {
-        username: 'john_doe',
+        userName: 'john_doe',
         email: 'john@example.com',
         password: 'password123'
       }
@@ -84,19 +84,19 @@ describe('RegistrationPresenter', () => {
     expect(screen.getByDisplayValue('password123')).toBeInTheDocument()
   })
 
-  it('should call onInputChange when user types in username field', async () => {
+  it('should call onInputChange when user types in userName field', async () => {
     // Arrange
     const user = userEvent.setup()
     const expectedValue = 'j'
     render(<RegistrationPresenter {...mockProps} />)
-    const usernameInput = screen.getByLabelText(/nom d'utilisateur/i)
+    const userNameInput = screen.getByLabelText(/nom d'utilisateur/i)
     
     // Act
-    await user.type(usernameInput, expectedValue)
+    await user.type(userNameInput, expectedValue)
     
     // Assert
     expect(mockProps.onInputChange).toHaveBeenCalledTimes(1)
-    expect(mockProps.onInputChange).toHaveBeenCalledWith('username', expectedValue)
+    expect(mockProps.onInputChange).toHaveBeenCalledWith('userName', expectedValue)
   })
 
   it('should call onInputChange when user types in email field', () => {

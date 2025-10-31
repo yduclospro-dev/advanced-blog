@@ -26,9 +26,9 @@ const mockArticle: Article = {
 
 const mockGetArticleById = jest.fn()
 const mockUpdateArticle = jest.fn()
-let mockCurrentUser: { id: string; username: string; email: string; password: string } | null = {
+let mockCurrentUser: { id: string; userName: string; email: string; password: string } | null = {
   id: 'user1',
-  username: 'TestUser',
+  userName: 'TestUser',
   email: 'test@test.com',
   password: 'pass'
 }
@@ -97,7 +97,7 @@ jest.mock('@/components/articles/presenters/EditArticlePresenter', () => ({
 describe('EditArticleContainer', () => {
   beforeEach(() => {
     jest.clearAllMocks()
-    mockCurrentUser = { id: 'user1', username: 'TestUser', email: 'test@test.com', password: 'pass' }
+    mockCurrentUser = { id: 'user1', userName: 'TestUser', email: 'test@test.com', password: 'pass' }
     mockGetArticleById.mockReturnValue(mockArticle)
   })
 
@@ -116,7 +116,7 @@ describe('EditArticleContainer', () => {
 
     it('should render EditArticlePresenter when authenticated', () => {
       // Arrange
-      mockCurrentUser = { id: 'user1', username: 'TestUser', email: 'test@test.com', password: 'pass' }
+      mockCurrentUser = { id: 'user1', userName: 'TestUser', email: 'test@test.com', password: 'pass' }
 
       // Act
       render(<EditArticleContainer />)
