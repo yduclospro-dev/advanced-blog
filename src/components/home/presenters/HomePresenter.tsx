@@ -6,7 +6,7 @@ import { ButtonLink, Card } from "@/components/ui";
 import ArticleCard from "@/components/ArticleCard";
 
 interface HomePresenterProps {
-  currentUser: { username: string } | null;
+  currentUser: { userName: string } | null;
   isAuthenticated: boolean;
   featuredArticles: Article[];
 }
@@ -36,7 +36,7 @@ export default function HomePresenter({
             <div className="inline-block mb-4 px-4 py-2 bg-sky-500/10 backdrop-blur-sm border border-sky-500/20 rounded-full">
               {isAuthenticated && currentUser ? (
                 <span className="text-sky-600 dark:text-sky-400 text-sm font-medium">
-                  👋 Bienvenue {currentUser.username}
+                  👋 Bienvenue {currentUser.userName}
                 </span>
               ) : (
                 <span className="text-sky-600 dark:text-sky-400 text-sm font-medium">

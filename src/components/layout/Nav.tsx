@@ -9,7 +9,7 @@ import type { ToastType } from "@/components/ui/Toast/toastTypes";
 import { useTheme } from '@/contexts/ThemeContext';
 
 export default function Navbar() {
-  const { currentUser, isAuthenticated, logout } = useUserStore()
+  const { currentUser, logout } = useUserStore()
   const router = useRouter()
   const { theme, toggleTheme } = useTheme()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -97,14 +97,14 @@ export default function Navbar() {
 
           
           <div className="hidden lg:flex items-center space-x-3">
-            {isAuthenticated && currentUser ? (
+            {currentUser ? (
               <>
                 <div className="flex items-center gap-3 bg-white/10 px-4 py-2 rounded-lg backdrop-blur-sm">
                   <div className="w-8 h-8 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full flex items-center justify-center text-white font-bold shadow-md">
-                    {currentUser.username.charAt(0).toUpperCase()}
+                    {currentUser.userName.charAt(0).toUpperCase()}
                   </div>
                   <span className="text-white font-semibold">
-                    {currentUser.username}
+                    {currentUser.userName}
                   </span>
                 </div>
                 <Button
@@ -196,14 +196,14 @@ export default function Navbar() {
               <div className="border-t border-white/20 my-4"></div>
 
               
-              {isAuthenticated && currentUser ? (
+              {currentUser ? (
                 <div className="space-y-4">
                   <div className="flex items-center gap-3 bg-white/10 px-4 py-3 rounded-lg">
                     <div className="w-10 h-10 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full flex items-center justify-center text-white font-bold shadow-md text-lg">
-                      {currentUser.username.charAt(0).toUpperCase()}
+                      {currentUser.userName.charAt(0).toUpperCase()}
                     </div>
                     <span className="text-white font-semibold text-lg">
-                      {currentUser.username}
+                      {currentUser.userName}
                     </span>
                   </div>
                   <Button
