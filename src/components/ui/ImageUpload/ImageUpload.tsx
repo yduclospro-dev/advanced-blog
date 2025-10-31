@@ -47,8 +47,7 @@ export default function ImageUpload({
                 setIsUploading(false);
             };
             reader.readAsDataURL(file);
-        } catch (error) {
-            console.error('Error uploading image:', error);
+        } catch {
             onError?.('Erreur lors du chargement de l\'image.');
             setIsUploading(false);
         }
