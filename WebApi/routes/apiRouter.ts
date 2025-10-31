@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { UserController } from "../controllers/UserController.ts";
+import { authenticate } from "../middleware/authenticate.ts";
 import { ArticleController } from "../controllers/ArticleController.ts";
 
 const apiRouter = Router();
@@ -14,13 +15,11 @@ apiRouter.get('/status', (req, res) => {
 // Routes pour les utilisateurs
 apiRouter.post('/register', userController.register.bind(userController));
 apiRouter.post('/login', userController.login.bind(userController));
-
-// Routes pour les articles
+apiRouter.get('/me', authenticate,  userController.me.bind(userController));
 apiRouter.get('/articles', articleController.getAll.bind(articleController));
 apiRouter.get('/articles/:id', articleController.getById.bind(articleController));
 apiRouter.post('/articles', articleController.create.bind(articleController));
 apiRouter.put('/articles/:id', articleController.update.bind(articleController));
 apiRouter.delete('/articles/:id', articleController.delete.bind(articleController));
-
 
 export default apiRouter;
