@@ -20,8 +20,6 @@ export class RegisterUser {
       throw new Error("Le mot de passe doit contenir au moins 6 caractères");
     }
 
-    console.log("USER TO REGISTER: ", user);
-
     const hashedPassword = await bcrypt.hash(password, 10);
     user.setPassword(hashedPassword);
     return await this.userRepository.create(user);
