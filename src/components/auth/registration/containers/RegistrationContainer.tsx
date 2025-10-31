@@ -10,7 +10,7 @@ import ClientOnly from "@/components/ClientOnly";
 
 export default function RegistrationContainer() {
   const [formData, setFormData] = useState({
-    username: '',
+    userName: '',
     email: '',
     password: ''
   })
@@ -28,7 +28,7 @@ export default function RegistrationContainer() {
     setIsLoading(true)
     setToast(null)
 
-    if (!formData.username.trim() || !formData.email.trim() || !formData.password.trim()) {
+    if (!formData.userName.trim() || !formData.email.trim() || !formData.password.trim()) {
       setToast({ message: 'Tous les champs sont obligatoires.', type: 'error' })
       setIsLoading(false)
       return
@@ -42,7 +42,7 @@ export default function RegistrationContainer() {
 
     try {
       const result = await register(
-        formData.username,
+        formData.userName,
         formData.email,
         formData.password
       )
