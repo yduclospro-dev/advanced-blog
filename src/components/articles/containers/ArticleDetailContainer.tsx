@@ -65,7 +65,7 @@ export default function ArticleDetailContainer() {
         addComment({
             articleId: article.id,
             authorId: currentUser.id,
-            authorName: currentUser.username,
+            authorName: currentUser.userName,
             content,
         });
         setToast({ message: "Commentaire ajouté avec succès !", type: "success" });
