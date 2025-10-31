@@ -17,6 +17,7 @@ export class LoginUser {
     }
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
+
     if (!isPasswordValid) {
       throw new Error("Mot de passe incorrect");
     }
