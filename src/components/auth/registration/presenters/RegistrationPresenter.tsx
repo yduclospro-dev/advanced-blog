@@ -2,7 +2,7 @@ import Link from 'next/link'
 import { Button, Input, Card } from '@/components/ui'
 
 interface RegistrationFormData {
-  username: string
+  userName: string
   email: string
   password: string
 }
@@ -44,11 +44,11 @@ export default function RegistrationPresenter({
 
           <form onSubmit={onSubmit} className="space-y-6">
             <Input
-              id="username"
+              id="userName"
               type="text"
               label="Nom d'utilisateur"
-              value={formData.username}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => onInputChange('username', e.target.value)}
+              value={formData.userName}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => onInputChange('userName', e.target.value)}
               placeholder="john_doe"
               disabled={isLoading}
               variant="auth"
