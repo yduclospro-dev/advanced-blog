@@ -24,7 +24,7 @@ export default function RegistrationPresenter({
 }: RegistrationPresenterProps) {
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-slate-900 dark:to-slate-800 p-4 transition-colors">
+    <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-blue-50 to-indigo-100 dark:from-slate-900 dark:to-slate-800 p-4 transition-colors">
       <div className="w-full max-w-md">
         <Card variant="auth" padding="lg">
           <div className="text-center mb-8">

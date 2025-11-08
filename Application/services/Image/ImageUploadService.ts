@@ -39,14 +39,12 @@ export class ImageUploadService {
    */
   async deleteImage(imageUrl: string): Promise<void> {
     try {
-      // Extraire le public_id de l'URL Cloudinary
       const publicId = this.extractPublicId(imageUrl);
       if (publicId) {
         await cloudinary.uploader.destroy(publicId);
       }
     } catch (error) {
       console.error('Error deleting image from Cloudinary:', error);
-      // On ne throw pas l'erreur pour ne pas bloquer la suppression de l'article
     }
   }
 

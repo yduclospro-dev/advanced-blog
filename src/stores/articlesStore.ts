@@ -67,7 +67,6 @@ export const useArticleStore = create<ArticleStore>()((set, get) => ({
                 content: articleData.content.trim(),
             };
 
-            // N'ajouter imageUrl que s'il est défini et non vide
             if (articleData.imageUrl && articleData.imageUrl.trim() !== "") {
                 payload.imageUrl = articleData.imageUrl.trim();
             }

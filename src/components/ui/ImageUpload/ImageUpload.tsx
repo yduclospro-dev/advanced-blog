@@ -32,14 +32,12 @@ export default function ImageUpload({
         setIsUploading(true);
 
         try {
-            // Créer un preview local
             const reader = new FileReader();
             reader.onload = (e) => {
                 setPreviewUrl(e.target?.result as string);
             };
             reader.readAsDataURL(file);
 
-            // Upload vers Cloudinary via le backend
             const formData = new FormData();
             formData.append('image', file);
 

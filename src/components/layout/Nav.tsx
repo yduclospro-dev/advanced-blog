@@ -17,7 +17,8 @@ export default function Navbar() {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
+    const timer = setTimeout(() => setMounted(true), 0);
+    return () => clearTimeout(timer);
   }, []);
 
   const handleLogout = () => {
@@ -32,7 +33,8 @@ export default function Navbar() {
   }
 
   useEffect(() => {
-    setIsMenuOpen(false)
+    const handleRouteChange = () => setIsMenuOpen(false);
+    handleRouteChange();
   }, [router])
 
   useEffect(() => {
@@ -60,7 +62,7 @@ export default function Navbar() {
         
         <div className="flex items-center justify-between">
           
-          <div className="flex-shrink-0">
+          <div className="shrink-0">
             <Link 
               href="/" 
               className="text-white hover:opacity-90 transition-all duration-200 flex items-center gap-3"
@@ -100,7 +102,7 @@ export default function Navbar() {
             {currentUser ? (
               <>
                 <div className="flex items-center gap-3 bg-white/10 px-4 py-2 rounded-lg backdrop-blur-sm">
-                  <div className="w-8 h-8 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full flex items-center justify-center text-white font-bold shadow-md">
+                  <div className="w-8 h-8 bg-linear-to-br from-yellow-400 to-orange-500 rounded-full flex items-center justify-center text-white font-bold shadow-md">
                     {currentUser.userName.charAt(0).toUpperCase()}
                   </div>
                   <span className="text-white font-semibold">
@@ -199,7 +201,7 @@ export default function Navbar() {
               {currentUser ? (
                 <div className="space-y-4">
                   <div className="flex items-center gap-3 bg-white/10 px-4 py-3 rounded-lg">
-                    <div className="w-10 h-10 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full flex items-center justify-center text-white font-bold shadow-md text-lg">
+                    <div className="w-10 h-10 bg-linear-to-br from-yellow-400 to-orange-500 rounded-full flex items-center justify-center text-white font-bold shadow-md text-lg">
                       {currentUser.userName.charAt(0).toUpperCase()}
                     </div>
                     <span className="text-white font-semibold text-lg">

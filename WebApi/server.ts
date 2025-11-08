@@ -14,7 +14,6 @@ nextApp.prepare().then(() => {
 
   app.use("/api", apiRouter);
 
-  // Middleware de gestion d'erreurs (doit être après toutes les routes)
   app.use(errorHandler);
 
   app.use((req, res) => handle(req, res));

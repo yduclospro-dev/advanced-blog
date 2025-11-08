@@ -6,7 +6,6 @@ const prisma = new PrismaClient();
 async function main() {
   console.log('🌱 Début du seeding de la base de données...');
 
-  // Vérifier si un admin existe déjà
   const existingAdmin = await prisma.user.findFirst({
     where: { role: UserRole.ADMIN }
   });
@@ -16,7 +15,6 @@ async function main() {
     return;
   }
 
-  // Créer un utilisateur admin par défaut
   const hashedPassword = await bcrypt.hash('admin123', 10);
 
   const admin = await prisma.user.create({

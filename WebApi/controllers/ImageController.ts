@@ -3,11 +3,9 @@ import multer from 'multer';
 import { ImageUploadService } from '../../Application/services/Image/ImageUploadService';
 import { BadRequestError } from '../../Domain/errors/index.ts';
 
-// Configuration de multer pour stocker les fichiers en mémoire
 const storage = multer.memoryStorage();
 
 const fileFilter = (req: Request, file: Express.Multer.File, cb: multer.FileFilterCallback) => {
-  // Accepter seulement les images
   if (file.mimetype.startsWith('image/')) {
     cb(null, true);
   } else {

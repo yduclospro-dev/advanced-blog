@@ -38,7 +38,7 @@ export default function NewArticlePresenter({
     }, [formData.content]);
 
     return (
-        <div className="bg-gradient-to-b from-gray-50 to-white dark:from-slate-900 dark:to-slate-800 min-h-screen py-16 px-6 md:px-20 lg:px-32 transition-colors">
+        <div className="bg-linear-to-b from-gray-50 to-white dark:from-slate-900 dark:to-slate-800 min-h-screen py-16 px-6 md:px-20 lg:px-32 transition-colors">
             <Card variant="default" padding="lg" className="max-w-3xl mx-auto">
                 <button
                     onClick={onCancel}

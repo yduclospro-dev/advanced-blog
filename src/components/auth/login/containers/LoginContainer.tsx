@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useUserStore } from "@/stores/userStore";
 import LoginPresenter from "../presenters/LoginPresenter";
@@ -19,11 +19,8 @@ export default function LoginContainer() {
   const [toast, setToast] = useState<{ message: string; type: ToastType } | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  useEffect(() => {
-    if (searchParams.get('registered') === 'true') {
-      setToast({ message: "Inscription réussie ! Vous pouvez maintenant vous connecter.", type: "success" });
-    }
-  }, [searchParams]);
+  const registered = searchParams.get('registered');
+  const showRegistrationSuccess = registered === 'true';
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -61,6 +58,13 @@ export default function LoginContainer() {
 
   return (
     <>
+      {showRegistrationSuccess && !toast && (
+        <Toast 
+          message="Inscription réussie ! Vous pouvez maintenant vous connecter." 
+          type="success" 
+          onClose={() => router.replace('/login')} 
+        />
+      )}
       {toast && (
         <Toast 
           message={toast.message} 
@@ -69,7 +73,7 @@ export default function LoginContainer() {
         />
       )}
       <ClientOnly fallback={
-        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-slate-900 dark:to-slate-800 p-4">
+        <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-blue-50 to-indigo-100 dark:from-slate-900 dark:to-slate-800 p-4">
           <p className="text-gray-600">Chargement...</p>
         </div>
       }>
