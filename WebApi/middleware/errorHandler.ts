@@ -14,14 +14,14 @@ export function errorHandler(
   // Si c'est une HttpError personnalisée, utiliser son code de statut
   if (error instanceof HttpError) {
     return res.status(error.statusCode).json({
-      error: error.message,
+      message: error.message,
       statusCode: error.statusCode
     });
   }
 
   // Pour toutes les autres erreurs, renvoyer 500
   return res.status(500).json({
-    error: 'Erreur interne du serveur',
+    message: 'Erreur interne du serveur',
     statusCode: 500
   });
 }
