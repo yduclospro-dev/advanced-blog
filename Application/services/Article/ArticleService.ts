@@ -3,7 +3,7 @@ import type { IArticleRepository } from "../../../Domain/repositories/IArticleRe
 import { DisplayArticleDto } from "../../dtos/Article/DisplayArticleDto.ts";
 import { CreateArticleDto } from "../../dtos/Article/CreateArticleDto.ts";
 import { UserRole } from "@prisma/client";
-import { isOwnerOrAdmin } from "../../../WebApi/middleware/authorize.ts";
+import { isOwnerOrAdmin } from "../../../Domain/utils/permissions.ts";
 import { BadRequestError, NotFoundError, ForbiddenError } from "../../../Domain/errors/index.ts";
 
 export class ArticleService {
@@ -93,8 +93,7 @@ export class ArticleService {
       throw new ForbiddenError("Non autorisé à modifier cet article");
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const updatedData: any = {};
+    const updatedData: Partial<{ title: string; content: string; imageUrl: string }> = {};
     if (updates.title) updatedData.title = updates.title.trim();
     if (updates.content) updatedData.content = updates.content.trim();
     if (updates.imageUrl !== undefined) updatedData.imageUrl = updates.imageUrl;
