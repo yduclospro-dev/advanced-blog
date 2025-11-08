@@ -6,19 +6,11 @@ const prisma = new PrismaClient();
 
 export class ArticleRepository implements IArticleRepository {
   async create(article: Article): Promise<Article> {
-    const user = await prisma.user.findUnique({
-      where: { userName: article.author },
-    });
-
-    if (!user) {
-      throw new Error(`Utilisateur '${article.author}' introuvable`);
-    }
-
     const created = await prisma.article.create({
       data: {
         title: article.title,
-        authorId: user.id,
-        content: article.content,
+        authorId: article.authorId,
+        content: article.content
       },
       include: {
         user: true,
@@ -26,13 +18,12 @@ export class ArticleRepository implements IArticleRepository {
     });
 
     return new Article(
-      created.id,
       created.title,
       created.user.userName,
       created.authorId,
       created.date.toISOString().split('T')[0],
       created.content,
-      article.imageUrl
+      created.id,
     );
   }
 
@@ -91,13 +82,12 @@ export class ArticleRepository implements IArticleRepository {
     });
 
     return new Article(
-      updated.id,
       updated.title,
       updated.user.userName,
       updated.authorId,
       updated.date.toISOString().split('T')[0],
       updated.content,
-      articleData.imageUrl
+      updated.id,
     );
   }
 

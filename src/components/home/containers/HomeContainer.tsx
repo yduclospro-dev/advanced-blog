@@ -6,7 +6,7 @@ import HomePresenter from "../presenters/HomePresenter";
 import ClientOnly from "@/components/ClientOnly";
 
 export default function HomeContainer() {
-  const { currentUser, isAuthenticated } = useUserStore();
+  const currentUser = useUserStore((state) => state.currentUser);
   const { getLatestArticles, fetchArticles, isLoading } = useArticleStore();
 
   useEffect(() => {
@@ -28,7 +28,6 @@ export default function HomeContainer() {
       ) : (
         <HomePresenter
           currentUser={currentUser}
-          isAuthenticated={isAuthenticated}
           featuredArticles={featuredArticles}
         />
       )}

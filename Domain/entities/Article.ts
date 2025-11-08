@@ -1,35 +1,59 @@
 export class Article {
-  public id: string;
-  public title: string;
-  public author: string;
-  public authorId: string;
-  public date: string;
-  public content: string;
-  public imageUrl?: string;
+  private _id?: string;
+  private _title: string;
+  private _author: string;
+  private _authorId: string;
+  private _date: string;
+  private _content: string;
+  private _imageUrl?: string;
 
   constructor(
-    id: string,
     title: string,
     author: string,
     authorId: string,
     date: string,
     content: string,
-    imageUrl?: string
+    id?: string
   ) {
-    this.id = id;
-    this.title = title;
-    this.author = author;
-    this.authorId = authorId;
-    this.date = date;
-    this.content = content;
-    this.imageUrl = imageUrl;
+    this._id = id;
+    this._title = title;
+    this._author = author;
+    this._authorId = authorId;
+    this._date = date;
+    this._content = content;
+  }
+
+  get id(): string | undefined {
+    return this._id;
+  }
+
+  get title(): string {
+    return this._title;
+  }
+
+  get author(): string {
+    return this._author;
+  }
+
+  get authorId(): string {
+    return this._authorId;
+  }
+  get date(): string {
+    return this._date;
+  }
+
+  get content(): string {
+    return this._content;
+  }
+  get imageUrl(): string | undefined {
+    return this._imageUrl;
   }
 
   isValidForCreation(): boolean {
     return (
-      this.title.trim().length > 0 &&
-      this.content.trim().length > 0 &&
-      this.author.trim().length > 0
+      this._title.trim().length > 0 &&
+      this._content.trim().length > 0 &&
+      this._author.trim().length > 0
     );
   }
 }

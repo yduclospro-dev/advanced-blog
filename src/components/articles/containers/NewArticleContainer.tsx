@@ -91,7 +91,7 @@ export default function NewArticleContainer() {
                 />
             )}
             <ClientOnly fallback={
-                <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-gray-50 to-white dark:from-slate-900 dark:to-slate-800 p-4">
+                <div className="min-h-screen flex items-center justify-center bg-linear-to-b from-gray-50 to-white dark:from-slate-900 dark:to-slate-800 p-4">
                     <p className="text-gray-500">Chargement...</p>
                 </div>
             }>

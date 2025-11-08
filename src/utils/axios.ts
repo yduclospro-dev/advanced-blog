@@ -8,10 +8,8 @@ const axiosInstance = axios.create({
   },
 });
 
-// 🎯 Intercepteur REQUEST - Ajoute automatiquement le token depuis Zustand
 axiosInstance.interceptors.request.use(
   (config) => {
-    // ✅ Récupère le token depuis le store Zustand (pas localStorage)
     const token = useUserStore.getState().token;
     
     if (token) {
@@ -25,7 +23,6 @@ axiosInstance.interceptors.request.use(
   }
 );
 
-// 🎯 Intercepteur RESPONSE - Gère les erreurs d'authentification
 axiosInstance.interceptors.response.use(
   (response) => {
     return response;
@@ -34,13 +31,8 @@ axiosInstance.interceptors.response.use(
     const url = error.config?.url || '';
     const status = error.response?.status;
     
-    // ⚠️ NE PAS logout si c'est une erreur 401 sur /login (credentials incorrects)
     if (status === 401 && !url.includes('/login')) {
       useUserStore.getState().logout();
-      
-      if (typeof window !== 'undefined') {
-        window.location.href = '/login';
-      }
     }
     
     return Promise.reject(error);

@@ -1,7 +1,8 @@
 import type { Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import { UserService } from "../../Application/services/User/UserService.ts";
-import type { User } from '@prisma/client';
+import type { UserDto } from '../../Application/dtos/UserDto.ts';
+import { log } from "console";
 
 export class UserController {
   private userService: UserService;
@@ -21,7 +22,8 @@ export class UserController {
       res.status(201).json({
         id: user.id,
         userName: user.userName,
-        email: user.email
+        email: user.email,
+        role: user.role
       });
     } catch {
       res.status(400).json({ error: "Echec de l'enregistrement de l'utilisateur" });
@@ -36,12 +38,10 @@ export class UserController {
     }
 
     try {
-      const user = await this.userService.login(email, password);
-      if (!user) {
-        return res.status(401).json({ error: "Email ou mot de passe incorrect" });
-      }
-
+      const user = await this.userService.verifyCredentials(email, password);
       const token = this.generateToken(user);
+
+      log("User logged in:", user);
 
       res.status(200).json({
         message: "Connexion réussie",
@@ -71,12 +71,11 @@ export class UserController {
     });
   }
 
-  private generateToken = (user: User): string =>
-    jwt.sign(
-      { 
-        userId: user.id, 
-        userRole: user.role 
-      }, 
-      process.env.JWT_SECRET, 
-      { expiresIn: '1h' });
+  private generateToken = (user: UserDto): string => {
+    return jwt.sign(
+      { userId: user.id },
+      process.env.JWT_SECRET,
+      { expiresIn: '24h' }
+    );
+  }
 }
