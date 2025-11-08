@@ -73,7 +73,11 @@ export class UserController {
 
   private generateToken = (user: UserDto): string => {
     return jwt.sign(
-      { userId: user.id },
+      { 
+        userId: user.id,
+        email: user.email,
+        role: user.role
+      },
       process.env.JWT_SECRET,
       { expiresIn: '24h' }
     );
