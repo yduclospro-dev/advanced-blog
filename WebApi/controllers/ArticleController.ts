@@ -1,27 +1,18 @@
 import type { Request, Response } from "express";
-import { ArticleRepository } from "../../Infrastructure/repositories/ArticleRepository.ts";
-import { CreateArticle } from "../../Application/services/CreateArticle.ts";
-import { UpdateArticle } from "../../Application/services/UpdateArticle.ts";
-import { DeleteArticle } from "../../Application/services/DeleteArticle.ts";
+import { ArticleService } from "../../Application/services/Article/ArticleService.ts";
 
 export class ArticleController {
-  private articleRepository: ArticleRepository;
-  private createArticle: CreateArticle;
-  private updateArticle: UpdateArticle;
-  private deleteArticle: DeleteArticle;
+  private articleService: ArticleService;
 
-  constructor() {
-    this.articleRepository = new ArticleRepository();
-    this.createArticle = new CreateArticle(this.articleRepository);
-    this.updateArticle = new UpdateArticle(this.articleRepository);
-    this.deleteArticle = new DeleteArticle(this.articleRepository);
+  constructor(articleService: ArticleService) {
+    this.articleService = articleService;
   }
 
   async getAll(req: Request, res: Response) {
     try {
-      const articles = await this.articleRepository.findAll();
+      const articles = await this.articleService.findAll();
       res.status(200).json(articles);
-    } catch (error) {
+    } catch {
       res.status(500).json({ error: "Erreur lors de la récupération des articles" });
     }
   }
@@ -30,12 +21,12 @@ export class ArticleController {
     const { id } = req.params;
 
     try {
-      const article = await this.articleRepository.findById(id);
+      const article = await this.articleService.findById(id);
       if (!article) {
         return res.status(404).json({ error: "Article non trouvé" });
       }
       res.status(200).json(article);
-    } catch (error) {
+    } catch {
       res.status(500).json({ error: "Erreur lors de la récupération de l'article" });
     }
   }
@@ -48,15 +39,14 @@ export class ArticleController {
     }
 
     try {
-      const createdArticle = await this.createArticle.execute(
+      const createdArticle = await this.articleService.create(
         title,
         author,
         content,
         imageUrl
       );
       res.status(201).json(createdArticle);
-    } catch (error) {
-      console.error("Erreur lors de la création de l'article:", error);
+    } catch {
       res.status(500).json({ error: "Erreur lors de la création de l'article" });
     }
   }
@@ -66,15 +56,13 @@ export class ArticleController {
     const { title, content, imageUrl } = req.body;
 
     try {
-      const updatedArticle = await this.updateArticle.execute(id, {
+      const updatedArticle = await this.articleService.update(id, {
         title,
         content,
         imageUrl,
       });
       res.status(200).json(updatedArticle);
     } catch (error) {
-      console.error("Erreur lors de la mise à jour de l'article:", error);
-      
       if ((error as Error).message === "Article non trouvé") {
         return res.status(404).json({ error: "Article non trouvé" });
       }
@@ -87,11 +75,9 @@ export class ArticleController {
     const { id } = req.params;
 
     try {
-      await this.deleteArticle.execute(id);
+      await this.articleService.delete(id);
       res.status(204).send();
     } catch (error) {
-      console.error("Erreur lors de la suppression de l'article:", error);
-      
       if ((error as Error).message === "Article non trouvé") {
         return res.status(404).json({ error: "Article non trouvé" });
       }
