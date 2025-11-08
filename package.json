@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "serve": "npx ts-node WebApi/server.ts",
+    "serve": "tsx WebApi/server.ts",
     "build": "next build --turbopack",
     "start": "next start",
     "test": "jest --watchAll",
@@ -38,6 +38,7 @@
     "jest-environment-jsdom": "^30.2.0",
     "prisma": "^6.18.0",
     "tailwindcss": "^4",
+    "tsx": "^4.20.6",
     "typescript": "^5"
   }
 }
