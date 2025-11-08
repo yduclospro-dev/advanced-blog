@@ -1,8 +1,9 @@
-import type { Request, Response } from "express";
+import type { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 import { UserService } from "../../Application/services/User/UserService.ts";
 import type { UserDto } from '../../Application/dtos/UserDto.ts';
 import { log } from "console";
+import { BadRequestError, UnauthorizedError, NotFoundError } from "../../Domain/errors/index.ts";
 
 export class UserController {
   private userService: UserService;
@@ -11,13 +12,13 @@ export class UserController {
     this.userService = userService;
   }
 
-  async register(req: Request, res: Response) {
-    const { userName, email, password } = req.body;
-    if (!userName || !email || !password) {
-      return res.status(400).json({ error: "Champs requis manquants" });
-    }
-
+  async register(req: Request, res: Response, next: NextFunction) {
     try {
+      const { userName, email, password } = req.body;
+      if (!userName || !email || !password) {
+        throw new BadRequestError("Champs requis manquants");
+      }
+
       const user = await this.userService.register(userName, email, password);
       res.status(201).json({
         id: user.id,
@@ -25,19 +26,19 @@ export class UserController {
         email: user.email,
         role: user.role
       });
-    } catch {
-      res.status(400).json({ error: "Echec de l'enregistrement de l'utilisateur" });
+    } catch (error) {
+      next(error);
     }
   }
 
-  async login(req: Request, res: Response) {
-    const { email, password } = req.body;
-
-    if (!email || !password) {
-      return res.status(400).json({ error: "Email et mot de passe requis" });
-    }
-
+  async login(req: Request, res: Response, next: NextFunction) {
     try {
+      const { email, password } = req.body;
+
+      if (!email || !password) {
+        throw new BadRequestError("Email et mot de passe requis");
+      }
+
       const user = await this.userService.verifyCredentials(email, password);
       const token = this.generateToken(user);
 
@@ -48,27 +49,31 @@ export class UserController {
         token
       });
     } catch (error) {
-      res.status(401).json({ error: (error as Error).message });
+      next(error);
     }
   }
 
-  async me(req: Request, res: Response) {
-    const userId = req.user?.id;
-    if (!userId) {
-      return res.status(401).json({ error: "Utilisateur non authentifié" });
-    }
+  async me(req: Request, res: Response, next: NextFunction) {
+    try {
+      const userId = req.user?.id;
+      if (!userId) {
+        throw new UnauthorizedError("Utilisateur non authentifié");
+      }
 
-    const user = await this.userService.findById(userId);
-    if (!user) {
-      return res.status(404).json({ error: "Utilisateur non trouvé" });
-    }
+      const user = await this.userService.findById(userId);
+      if (!user) {
+        throw new NotFoundError("Utilisateur non trouvé");
+      }
 
-    res.status(200).json({
-      id: user.id,
-      email: user.email,
-      userName: user.userName,
-      role: user.role
-    });
+      res.status(200).json({
+        id: user.id,
+        email: user.email,
+        userName: user.userName,
+        role: user.role
+      });
+    } catch (error) {
+      next(error);
+    }
   }
 
   private generateToken = (user: UserDto): string => {
