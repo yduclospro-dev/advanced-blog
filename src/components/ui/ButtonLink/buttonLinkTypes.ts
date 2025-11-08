@@ -12,10 +12,11 @@ export type ButtonLinkSize = 'sm' | 'md' | 'lg';
 
 export interface ButtonLinkProps {
   label: string;
-  href: string;
+  href?: string;
   variant?: ButtonLinkVariant;
   size?: ButtonLinkSize;
   fullWidth?: boolean;
   className?: string;
   icon?: React.ReactNode;
+  onClick?: (e: React.MouseEvent<HTMLAnchorElement | HTMLButtonElement>) => void;
 }
