@@ -72,7 +72,7 @@ export default function RegistrationContainer() {
         />
       )}
       <ClientOnly fallback={
-        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-slate-900 dark:to-slate-800 p-4">
+        <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-blue-50 to-indigo-100 dark:from-slate-900 dark:to-slate-800 p-4">
           <p className="text-gray-600">Chargement...</p>
         </div>
       }>

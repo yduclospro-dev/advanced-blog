@@ -7,7 +7,6 @@ import { authenticate } from "../middleware/authenticate.ts";
 
 const apiRouter = Router();
 
-// Create controllers with services
 const userController = new UserController(userService);
 const articleController = new ArticleController(articleService);
 const imageController = new ImageController(imageUploadService);
@@ -20,11 +19,9 @@ apiRouter.post('/register', userController.register.bind(userController));
 apiRouter.post('/login', userController.login.bind(userController));
 apiRouter.get('/me', authenticate,  userController.me.bind(userController));
 
-// Image upload routes
 apiRouter.post('/upload/image', authenticate, upload.single('image'), imageController.uploadImage.bind(imageController));
 apiRouter.delete('/upload/image', authenticate, imageController.deleteImage.bind(imageController));
 
-// Article routes
 apiRouter.get('/articles', articleController.getAll.bind(articleController));
 apiRouter.get('/articles/:id', articleController.getById.bind(articleController));
 apiRouter.post('/articles', authenticate, articleController.create.bind(articleController));

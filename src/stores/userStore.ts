@@ -108,10 +108,8 @@ const userStoreCreator: StateCreator<UserState, [], [], UserState> = (set, get) 
 
       const token = loginResponse.data.token;
       
-      // Store token in state (will be persisted via middleware)
       set({ token });
 
-      // Fetch current user with the new token
       const currentUserRequest = await get().fetchCurrentUser();
       if (!currentUserRequest.success) {
         set({ token: null });
@@ -137,7 +135,6 @@ const userStoreCreator: StateCreator<UserState, [], [], UserState> = (set, get) 
       token: null
     });
     
-    // Manually remove from localStorage to ensure clean logout
     localStorage.removeItem('token-storage');
   },
 });
@@ -147,7 +144,6 @@ export const useUserStore = create<UserState>()(
     userStoreCreator,
     {
       name: 'token-storage',
-      // Only persist the token, not the user data or users list
       partialize: (state) => ({ token: state.token }),
     }
   )

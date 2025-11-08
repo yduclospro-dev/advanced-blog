@@ -19,10 +19,9 @@ export class ArticleService {
     content: string,
     imageUrl?: string
   ): Promise<CreateArticleDto> {
-    // On ne prend plus "author" en paramètre, on le récupérera du repository avec l'authorId
     const article = new Article(
       title,
-      "", // author sera rempli par le repository après récupération du user
+      "",
       authorId,
       new Date().toISOString().split("T")[0],
       content,

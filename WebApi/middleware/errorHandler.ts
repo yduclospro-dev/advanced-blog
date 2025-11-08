@@ -8,10 +8,8 @@ export function errorHandler(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   next: NextFunction
 ) {
-  // Log l'erreur pour le debugging
   console.error('Error:', error);
 
-  // Si c'est une HttpError personnalisée, utiliser son code de statut
   if (error instanceof HttpError) {
     return res.status(error.statusCode).json({
       message: error.message,
@@ -19,7 +17,6 @@ export function errorHandler(
     });
   }
 
-  // Pour toutes les autres erreurs, renvoyer 500
   return res.status(500).json({
     message: 'Erreur interne du serveur',
     statusCode: 500
