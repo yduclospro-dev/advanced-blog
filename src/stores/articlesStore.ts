@@ -3,12 +3,13 @@
 import { create } from "zustand";
 import { Article } from "@/types/Article";
 import axios from "@/utils/axios";
+import { isAxiosError } from "axios";
+import { useUiStore } from "./uiStore";
 
 const API_URL = "/articles";
 
 interface ArticleStore {
     articles: Article[];
-    isLoading: boolean;
     error: string | null;
     fetchArticles: () => Promise<void>;
     getArticleById: (id: string) => Article | undefined;
@@ -18,17 +19,15 @@ interface ArticleStore {
     deleteArticle: (id: string) => Promise<void>;
     toggleArticleLike: (articleId: string, userId: string) => void;
     toggleArticleDislike: (articleId: string, userId: string) => void;
-    safeAddArticle: (articleData: Omit<Article, "id" | "date" | "author" | "authorId">) => Promise<void>;
-    safeUpdateArticle: (id: string, updatedData: Partial<Article>) => Promise<void>;
 }
 
 export const useArticleStore = create<ArticleStore>()((set, get) => ({
     articles: [],
-    isLoading: false,
     error: null,
 
     fetchArticles: async () => {
-        set({ isLoading: true, error: null });
+        useUiStore.getState().setLoading('articles', true);
+        set({ error: null });
         try {
             const response = await axios.get(API_URL);
             const articles = response.data;
@@ -39,9 +38,14 @@ export const useArticleStore = create<ArticleStore>()((set, get) => ({
                 dislikes: JSON.parse(localStorage.getItem(`article-${article.id}-dislikes`) || "[]"),
             }));
             
-            set({ articles: articlesWithLikes, isLoading: false });
-        } catch (error) {
-            set({ error: (error as Error).message, isLoading: false });
+            set({ articles: articlesWithLikes });
+            useUiStore.getState().setLoading('articles', false);
+        } catch (error: unknown) {
+            const errorMessage = isAxiosError(error) 
+                ? error.response?.data?.message || error.message 
+                : "Erreur lors de la récupération des articles";
+            set({ error: errorMessage });
+            useUiStore.getState().setLoading('articles', false);
         }
     },
 
@@ -55,7 +59,8 @@ export const useArticleStore = create<ArticleStore>()((set, get) => ({
     },
 
     addArticle: async (articleData) => {
-        set({ isLoading: true, error: null });
+        useUiStore.getState().setLoading('articles', true);
+        set({ error: null });
         try {
             const payload: { title: string; content: string; imageUrl?: string } = {
                 title: articleData.title.trim(),
@@ -77,17 +82,22 @@ export const useArticleStore = create<ArticleStore>()((set, get) => ({
             };
             
             set({ 
-                articles: [...get().articles, articleWithLikes],
-                isLoading: false 
+                articles: [...get().articles, articleWithLikes]
             });
-        } catch (error) {
-            set({ error: (error as Error).message, isLoading: false });
-            throw error;
+            useUiStore.getState().setLoading('articles', false);
+        } catch (error: unknown) {
+            const errorMessage = isAxiosError(error)
+                ? error.response?.data?.message || error.message
+                : "Erreur lors de la création de l'article";
+            set({ error: errorMessage });
+            useUiStore.getState().setLoading('articles', false);
+            throw new Error(errorMessage);
         }
     },
 
     updateArticle: async (id, updatedData) => {
-        set({ isLoading: true, error: null });
+        useUiStore.getState().setLoading('articles', true);
+        set({ error: null });
         try {
             const response = await axios.put(`${API_URL}/${id}`, {
                 ...(updatedData.title && { title: updatedData.title.trim() }),
@@ -105,17 +115,22 @@ export const useArticleStore = create<ArticleStore>()((set, get) => ({
                         likes: currentArticle?.likes || [],
                         dislikes: currentArticle?.dislikes || [],
                     } : a
-                ),
-                isLoading: false,
+                )
             });
-        } catch (error) {
-            set({ error: (error as Error).message, isLoading: false });
-            throw error;
+            useUiStore.getState().setLoading('articles', false);
+        } catch (error: unknown) {
+            const errorMessage = isAxiosError(error)
+                ? error.response?.data?.message || error.message
+                : "Erreur lors de la modification de l'article";
+            set({ error: errorMessage });
+            useUiStore.getState().setLoading('articles', false);
+            throw new Error(errorMessage);
         }
     },
 
     deleteArticle: async (id) => {
-        set({ isLoading: true, error: null });
+        useUiStore.getState().setLoading('articles', true);
+        set({ error: null });
         try {
             await axios.delete(`${API_URL}/${id}`);
 
@@ -123,12 +138,16 @@ export const useArticleStore = create<ArticleStore>()((set, get) => ({
             localStorage.removeItem(`article-${id}-dislikes`);
 
             set({
-                articles: get().articles.filter((a) => a.id !== id),
-                isLoading: false,
+                articles: get().articles.filter((a) => a.id !== id)
             });
-        } catch (error) {
-            set({ error: (error as Error).message, isLoading: false });
-            throw error;
+            useUiStore.getState().setLoading('articles', false);
+        } catch (error: unknown) {
+            const errorMessage = isAxiosError(error)
+                ? error.response?.data?.message || error.message
+                : "Erreur lors de la suppression de l'article";
+            set({ error: errorMessage });
+            useUiStore.getState().setLoading('articles', false);
+            throw new Error(errorMessage);
         }
     },
 
@@ -184,13 +203,5 @@ export const useArticleStore = create<ArticleStore>()((set, get) => ({
                 };
             }),
         });
-    },
-
-    safeAddArticle: async (articleData) => {
-        return get().addArticle(articleData);
-    },
-
-    safeUpdateArticle: async (id, updatedData) => {
-        return get().updateArticle(id, updatedData);
     },
 }));

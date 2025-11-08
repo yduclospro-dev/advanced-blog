@@ -6,6 +6,7 @@ import Button from "../Button/Button";
 import { validateImageFile, MAX_FILE_SIZE_MB } from "@/utils/imageValidation";
 import Image from "next/image";
 import axios from "@/utils/axios";
+import { isAxiosError } from "axios";
 
 export default function ImageUpload({
     value,
@@ -51,8 +52,13 @@ export default function ImageUpload({
             const { imageUrl } = response.data;
             onChange(imageUrl);
             setIsUploading(false);
-        } catch (error) {
-            onError?.(error instanceof Error ? error.message : 'Erreur lors de l\'upload de l\'image.');
+        } catch (error: unknown) {
+            const errorMessage = isAxiosError(error)
+                ? error.response?.data?.message || error.message
+                : error instanceof Error 
+                    ? error.message 
+                    : 'Erreur lors de l\'upload de l\'image.';
+            onError?.(errorMessage);
             setPreviewUrl(null);
             setIsUploading(false);
         }

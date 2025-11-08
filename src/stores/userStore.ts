@@ -1,9 +1,9 @@
 import { create, StateCreator } from "zustand";
 import { persist } from "zustand/middleware";
-import { User } from "@/types/User";
 import axiosInstance from "../utils/axios";
 import { UserRole } from "@prisma/client";
-import axios from "axios";
+import { isAxiosError } from "axios";
+import { useUiStore } from "./uiStore";
 
 interface AuthUser {
   id: string;
@@ -13,50 +13,45 @@ interface AuthUser {
 }
 
 interface UserState {
-  users: User[];
   currentUser: AuthUser | null;
   token: string | null;
-  isLoading: boolean;
 
   initializeAuth: () => Promise<void>;
   fetchCurrentUser: () => Promise<{ success: boolean; error?: string; user?: AuthUser }>;
-  getAllUsers: () => User[];
   register: (userName: string, email: string, password: string) => Promise<{ success: boolean; error?: string }>;
   login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
   logout: () => void;
 }
 
 const userStoreCreator: StateCreator<UserState, [], [], UserState> = (set, get) => ({
-  users: [],
   currentUser: null,
   token: null,
-  isLoading: false,
 
   initializeAuth: async () => {
     const token = get().token;
     
     if (!token) {
-      set({ isLoading: false });
+      useUiStore.getState().setLoading('auth', false);
       return;
     }
 
-    set({ isLoading: true });
+    useUiStore.getState().setLoading('auth', true);
     const result = await get().fetchCurrentUser();
     
     if (!result.success) {
       set({ 
         token: null, 
-        currentUser: null, 
-        isLoading: false 
+        currentUser: null
       });
       localStorage.removeItem('token-storage');
+      useUiStore.getState().setLoading('auth', false);
       return;
     }
     
     set({ 
-      currentUser: result.user,
-      isLoading: false 
+      currentUser: result.user
     });
+    useUiStore.getState().setLoading('auth', false);
   },
 
   fetchCurrentUser: async () => {
@@ -77,14 +72,12 @@ const userStoreCreator: StateCreator<UserState, [], [], UserState> = (set, get) 
         }
       };
     } catch (err: unknown) {
-      if (axios.isAxiosError(err)) {
-        return { success: false, error: err.response?.data?.error || "Erreur lors de la récupération de l'utilisateur" };
+      if (isAxiosError(err)) {
+        return { success: false, error: err.response?.data?.message || "Erreur lors de la récupération de l'utilisateur" };
       }
       return { success: false, error: "Erreur réseau ou serveur" };
     }
   },
-
-  getAllUsers: () => get().users,
 
   register: async (userName: string, email: string, password: string) => {
     try {
@@ -94,12 +87,12 @@ const userStoreCreator: StateCreator<UserState, [], [], UserState> = (set, get) 
         password
       });
       if (response.status !== 201 && response.status !== 200) {
-        return { success: false, error: response.data?.error || "Erreur lors de l'inscription" };
+        return { success: false, error: response.data?.message || "Erreur lors de l'inscription" };
       }
       return { success: true };
     } catch (err: unknown) {
-      if (axios.isAxiosError(err)) {
-        return { success: false, error: err.response?.data?.error };
+      if (isAxiosError(err)) {
+        return { success: false, error: err.response?.data?.message || "Erreur lors de l'inscription" };
       }
       return { success: false, error: "Erreur réseau ou serveur" };
     }
@@ -110,7 +103,7 @@ const userStoreCreator: StateCreator<UserState, [], [], UserState> = (set, get) 
       const loginResponse = await axiosInstance.post('/login', { email, password });
       
       if (loginResponse.status !== 200) {
-        return { success: false, error: loginResponse.data?.error };
+        return { success: false, error: loginResponse.data?.message };
       }
 
       const token = loginResponse.data.token;
@@ -131,8 +124,8 @@ const userStoreCreator: StateCreator<UserState, [], [], UserState> = (set, get) 
 
       return { success: true };
     } catch (err: unknown) {
-      if (axios.isAxiosError(err)) {
-        return { success: false, error: err.response?.data?.error };
+      if (isAxiosError(err)) {
+        return { success: false, error: err.response?.data?.message || "Email ou mot de passe incorrect" };
       }
       return { success: false, error: "Erreur réseau ou serveur" };
     }
