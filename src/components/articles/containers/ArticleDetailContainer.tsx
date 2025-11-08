@@ -9,11 +9,13 @@ import ArticleDetailPresenter from "../presenters/ArticleDetailPresenter";
 import { Toast } from "@/components/ui";
 import type { ToastType } from "@/components/ui/Toast/toastTypes";
 import ClientOnly from "@/components/ClientOnly";
+import { useUiStore } from "@/stores/uiStore";
 
 export default function ArticleDetailContainer() {
     const { id } = useParams();
     const router = useRouter();
-    const { getArticleById, toggleArticleLike, toggleArticleDislike, fetchArticles, isLoading } = useArticleStore();
+    const { getArticleById, toggleArticleLike, toggleArticleDislike, fetchArticles } = useArticleStore();
+    const isLoading = useUiStore((state) => state.isLoading('articles'));
     const currentUser = useUserStore((state) => state.currentUser);
     const { 
         getCommentsByArticle, 

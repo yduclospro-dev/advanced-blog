@@ -7,10 +7,12 @@ import { useUserStore } from "@/stores/userStore";
 import ArticlesListPresenter from "../presenters/ArticlesListPresenter";
 import ClientOnly from "@/components/ClientOnly";
 import ConfirmModal from "@/components/ConfirmModal";
+import { useUiStore } from "@/stores/uiStore";
 
 export default function ArticlesListContainer() {
     const router = useRouter();
-    const { articles, fetchArticles, isLoading, deleteArticle } = useArticleStore();
+    const { articles, fetchArticles, deleteArticle } = useArticleStore();
+    const isLoading = useUiStore((state) => state.isLoading('articles'));
     const currentUser = useUserStore((state) => state.currentUser);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [articleToDelete, setArticleToDelete] = useState<string | null>(null);

@@ -12,7 +12,7 @@ import ClientOnly from "@/components/ClientOnly";
 
 export default function NewArticleContainer() {
     const router = useRouter();
-    const { safeAddArticle } = useArticleStore();
+    const { addArticle } = useArticleStore();
     const { currentUser } = useUserStore();
 
     const [formData, setFormData] = useState({
@@ -53,7 +53,7 @@ export default function NewArticleContainer() {
         };
 
         try {
-            await safeAddArticle(newArticle);
+            await addArticle(newArticle);
             setToast({ message: "Article créé avec succès !", type: "success" });
             
             setTimeout(() => {

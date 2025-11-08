@@ -13,7 +13,7 @@ import ClientOnly from "@/components/ClientOnly";
 export default function EditArticleContainer() {
   const { id } = useParams();
   const router = useRouter();
-  const { getArticleById, safeUpdateArticle } = useArticleStore();
+  const { getArticleById, updateArticle } = useArticleStore();
   const { currentUser } = useUserStore();
 
   const article = getArticleById(String(id));
@@ -39,7 +39,7 @@ export default function EditArticleContainer() {
   const handleSave = async () => {
     if (article) {
       try {
-        await safeUpdateArticle(article.id, {
+        await updateArticle(article.id, {
           title: formData.title,
           content: formData.content,
           imageUrl: formData.imageUrl || undefined
