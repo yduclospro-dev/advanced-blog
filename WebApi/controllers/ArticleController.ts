@@ -61,38 +61,56 @@ export class ArticleController {
     }
   }
 
-  // async update(req: Request, res: Response) {
-  //   const { id } = req.params;
-  //   const { title, content, imageUrl } = req.body;
+  async update(req: Request, res: Response) {
+    const { id } = req.params;
+    const { title, content, imageUrl } = req.body;
+    const userId = req.user?.id;
+    const userRole = req.user?.role;
 
-  //   try {
-  //     const updatedArticle = await this.articleService.update(id, {
-  //       title,
-  //       content,
-  //       imageUrl,
-  //     });
-  //     res.status(200).json(updatedArticle);
-  //   } catch (error) {
-  //     if ((error as Error).message === "Article non trouvé") {
-  //       return res.status(404).json({ error: "Article non trouvé" });
-  //     }
+    if (!userId || !userRole) {
+      return res.status(401).json({ error: "Utilisateur non authentifié" });
+    }
+
+    try {
+      const updatedArticle = await this.articleService.update(id, userId, userRole, {
+        title,
+        content,
+        imageUrl,
+      });
+      res.status(200).json(updatedArticle);
+    } catch (error) {
+      if ((error as Error).message === "Article non trouvé") {
+        return res.status(404).json({ error: "Article non trouvé" });
+      }
+      if ((error as Error).message === "Non autorisé à modifier cet article") {
+        return res.status(403).json({ error: "Non autorisé à modifier cet article" });
+      }
       
-  //     res.status(500).json({ error: "Erreur lors de la mise à jour de l'article" });
-  //   }
-  // }
+      res.status(500).json({ error: "Erreur lors de la mise à jour de l'article" });
+    }
+  }
 
-  // async delete(req: Request, res: Response) {
-  //   const { id } = req.params;
+  async delete(req: Request, res: Response) {
+    const { id } = req.params;
+    const userId = req.user?.id;
+    const userRole = req.user?.role;
 
-  //   try {
-  //     await this.articleService.delete(id);
-  //     res.status(204).send();
-  //   } catch (error) {
-  //     if ((error as Error).message === "Article non trouvé") {
-  //       return res.status(404).json({ error: "Article non trouvé" });
-  //     }
+    if (!userId || !userRole) {
+      return res.status(401).json({ error: "Utilisateur non authentifié" });
+    }
+
+    try {
+      await this.articleService.delete(id, userId, userRole);
+      res.status(204).send();
+    } catch (error) {
+      if ((error as Error).message === "Article non trouvé") {
+        return res.status(404).json({ error: "Article non trouvé" });
+      }
+      if ((error as Error).message === "Non autorisé à supprimer cet article") {
+        return res.status(403).json({ error: "Non autorisé à supprimer cet article" });
+      }
       
-  //     res.status(500).json({ error: "Erreur lors de la suppression de l'article" });
-  //   }
-  // }
+      res.status(500).json({ error: "Erreur lors de la suppression de l'article" });
+    }
+  }
 }
