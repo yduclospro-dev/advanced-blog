@@ -1,87 +1,52 @@
 import { Article } from "@/types/Article";
 import { Comment } from "@/types/Comment";
-import ConfirmModal from "@/components/ConfirmModal";
-import { Button, ButtonLink, Card, LikeDislikeButtons } from "@/components/ui";
+import { Button, Card, LikeDislikeButtons } from "@/components/ui";
 import CommentsListContainer from "../comments/containers/CommentsListContainer";
 import CommentFormContainer from "../comments/containers/CommentFormContainer";
 import Image from "next/image";
 
+interface CommentHandlers {
+    onAdd: (content: string) => void;
+    onUpdate: (commentId: string, content: string) => void;
+    onDelete: (commentId: string) => void;
+    onLike: (commentId: string) => void;
+    onDislike: (commentId: string) => void;
+}
+
+interface ArticleLikeHandlers {
+    onLike: () => void;
+    onDislike: () => void;
+}
+
 interface ArticleDetailPresenterProps {
     article: Article;
     isAuthenticated: boolean;
-    isAuthor: boolean;
-    showConfirm: boolean;
-    onDelete: () => void;
-    onCancelDelete: () => void;
-    onShowConfirm: () => void;
+    currentUserId?: string;
     onBack: () => void;
     comments: Comment[];
-    currentUserId?: string;
-    onAddComment: (content: string) => void;
-    onUpdateComment: (commentId: string, content: string) => void;
-    onDeleteComment: (commentId: string) => void;
-    onArticleLike: () => void;
-    onArticleDislike: () => void;
-    onCommentLike: (commentId: string) => void;
-    onCommentDislike: (commentId: string) => void;
+    commentHandlers: CommentHandlers;
+    articleLikeHandlers: ArticleLikeHandlers;
 }
 
 export default function ArticleDetailPresenter({
     article,
     isAuthenticated,
-    isAuthor,
-    showConfirm,
-    onDelete,
-    onCancelDelete,
-    onShowConfirm,
+    currentUserId,
     onBack,
     comments,
-    currentUserId,
-    onAddComment,
-    onUpdateComment,
-    onDeleteComment,
-    onArticleLike,
-    onArticleDislike,
-    onCommentLike,
-    onCommentDislike,
+    commentHandlers,
+    articleLikeHandlers,
 }: ArticleDetailPresenterProps) {
     return (
         <div className="bg-linear-to-b from-gray-50 to-white dark:from-slate-900 dark:to-slate-800 min-h-screen py-16 px-6 md:px-20 lg:px-32 transition-colors">
             <Card variant="default" padding="lg" className="max-w-3xl mx-auto relative">
-                <div className="mb-6 flex items-center justify-between">
+                <div className="mb-6">
                     <Button
                         variant="ghost"
                         onClick={onBack}
                         className="text-sm"
                         label="← Retour à la liste"
                     />
-
-                    {isAuthenticated && isAuthor && (
-                        <div className="flex gap-3">
-                            <ButtonLink
-                                href={`/articles/${article.id}/edit`}
-                                variant="primary"
-                                className="p-2.5"
-                                label=""
-                                icon={
-                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                    </svg>
-                                }
-                            />
-                            <Button
-                                variant="danger"
-                                onClick={onShowConfirm}
-                                className="p-2.5"
-                                label=""
-                                icon={
-                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                    </svg>
-                                }
-                            />
-                        </div>
-                    )}
                 </div>
 
                 <article>
@@ -123,12 +88,12 @@ export default function ArticleDetailPresenter({
                     {isAuthenticated && (
                         <div className="mt-8 flex justify-center">
                             <LikeDislikeButtons
-                                likesCount={article.likes.length}
-                                dislikesCount={article.dislikes.length}
-                                hasLiked={currentUserId ? article.likes.includes(currentUserId) : false}
-                                hasDisliked={currentUserId ? article.dislikes.includes(currentUserId) : false}
-                                onLike={onArticleLike}
-                                onDislike={onArticleDislike}
+                                likesCount={article.likes?.length ?? 0}
+                                dislikesCount={article.dislikes?.length ?? 0}
+                                hasLiked={currentUserId ? article.likes?.includes(currentUserId) ?? false : false}
+                                hasDisliked={currentUserId ? article.dislikes?.includes(currentUserId) ?? false : false}
+                                onLike={articleLikeHandlers.onLike}
+                                onDislike={articleLikeHandlers.onDislike}
                             />
                         </div>
                     )}
@@ -137,7 +102,7 @@ export default function ArticleDetailPresenter({
                 <div className="mt-12 pt-8 border-t-2 border-gray-200 dark:border-slate-700">
                     {isAuthenticated ? (
                         <div className="mb-8">
-                            <CommentFormContainer onSubmit={onAddComment} />
+                            <CommentFormContainer onSubmit={commentHandlers.onAdd} />
                         </div>
                     ) : (
                         <div className="mb-8 p-6 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg text-center">
@@ -150,21 +115,13 @@ export default function ArticleDetailPresenter({
                     <CommentsListContainer
                         comments={comments}
                         currentUserId={currentUserId}
-                        onDelete={onDeleteComment}
-                        onUpdate={onUpdateComment}
-                        onLike={onCommentLike}
-                        onDislike={onCommentDislike}
+                        onDelete={commentHandlers.onDelete}
+                        onUpdate={commentHandlers.onUpdate}
+                        onLike={commentHandlers.onLike}
+                        onDislike={commentHandlers.onDislike}
                     />
                 </div>
             </Card>
-
-            {showConfirm && (
-                <ConfirmModal
-                    message="Cette action est irréversible."
-                    onConfirm={onDelete}
-                    onCancel={onCancelDelete}
-                />
-            )}
         </div>
     );
 }

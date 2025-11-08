@@ -13,7 +13,7 @@ import ClientOnly from "@/components/ClientOnly";
 export default function ArticleDetailContainer() {
     const { id } = useParams();
     const router = useRouter();
-    const { getArticleById, deleteArticle, toggleArticleLike, toggleArticleDislike, fetchArticles, isLoading } = useArticleStore();
+    const { getArticleById, toggleArticleLike, toggleArticleDislike, fetchArticles, isLoading } = useArticleStore();
     const currentUser = useUserStore((state) => state.currentUser);
     const { 
         getCommentsByArticle, 
@@ -24,40 +24,13 @@ export default function ArticleDetailContainer() {
         toggleCommentDislike
     } = useCommentsStore();
     
-    const [showConfirm, setShowConfirm] = useState(false);
     const [toast, setToast] = useState<{ message: string; type: ToastType } | null>(null);
     const article = getArticleById(String(id));
     const comments = article ? getCommentsByArticle(article.id) : [];
 
-    const isAuthor = !!(article && currentUser?.id === article.authorId);
-
     useEffect(() => {
         fetchArticles();
     }, [fetchArticles]);
-
-    useEffect(() => {
-        document.body.style.overflow = showConfirm ? "hidden" : "auto";
-    }, [showConfirm]);
-
-    const handleDelete = async () => {
-        if (article) {
-            await deleteArticle(article.id);
-            setShowConfirm(false);
-            setToast({ message: "Article supprimé avec succès !", type: "success" });
-            
-            setTimeout(() => {
-                router.push("/articles");
-            }, 1500);
-        }
-    };
-
-    const handleCancelDelete = () => {
-        setShowConfirm(false);
-    };
-
-    const handleShowConfirm = () => {
-        setShowConfirm(true);
-    };
 
     const handleBack = () => {
         router.push("/articles");
@@ -138,21 +111,20 @@ export default function ArticleDetailContainer() {
                 <ArticleDetailPresenter
                     article={article}
                     isAuthenticated={!!currentUser}
-                    isAuthor={isAuthor}
-                    showConfirm={showConfirm}
-                    onDelete={handleDelete}
-                    onCancelDelete={handleCancelDelete}
-                    onShowConfirm={handleShowConfirm}
+                    currentUserId={currentUser?.id}
                     onBack={handleBack}
                     comments={comments}
-                    currentUserId={currentUser?.id}
-                    onAddComment={handleAddComment}
-                    onUpdateComment={handleUpdateComment}
-                    onDeleteComment={handleDeleteComment}
-                    onArticleLike={handleArticleLike}
-                    onArticleDislike={handleArticleDislike}
-                    onCommentLike={handleCommentLike}
-                    onCommentDislike={handleCommentDislike}
+                    commentHandlers={{
+                        onAdd: handleAddComment,
+                        onUpdate: handleUpdateComment,
+                        onDelete: handleDeleteComment,
+                        onLike: handleCommentLike,
+                        onDislike: handleCommentDislike,
+                    }}
+                    articleLikeHandlers={{
+                        onLike: handleArticleLike,
+                        onDislike: handleArticleDislike,
+                    }}
                 />
             </ClientOnly>
         </>
