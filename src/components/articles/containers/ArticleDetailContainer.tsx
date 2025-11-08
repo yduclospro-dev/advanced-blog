@@ -14,7 +14,7 @@ export default function ArticleDetailContainer() {
     const { id } = useParams();
     const router = useRouter();
     const { getArticleById, deleteArticle, toggleArticleLike, toggleArticleDislike, fetchArticles, isLoading } = useArticleStore();
-    const { isAuthenticated, currentUser } = useUserStore();
+    const currentUser = useUserStore((state) => state.currentUser);
     const { 
         getCommentsByArticle, 
         addComment, 
@@ -137,7 +137,7 @@ export default function ArticleDetailContainer() {
             }>
                 <ArticleDetailPresenter
                     article={article}
-                    isAuthenticated={isAuthenticated}
+                    isAuthenticated={!!currentUser}
                     isAuthor={isAuthor}
                     showConfirm={showConfirm}
                     onDelete={handleDelete}

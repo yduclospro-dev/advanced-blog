@@ -13,19 +13,25 @@ export class UserRepository implements IUserRepository {
         password: user.password,
       },
     });
-    return new User(created.id, created.userName, created.email, created.password);
+    
+    return new User(
+      created.userName,
+      created.email,
+      created.password,
+      created.id
+    );
   }
 
   async findByEmail(email: string): Promise<User | null> {
     const found = await prisma.user.findUnique({ where: { email } });
     if (!found) return null;
-    return new User(found.id, found.userName, found.email, found.password);
+    return new User(found.userName, found.email, found.password, found.id);
   }
 
   async findById(id: string): Promise<User | null> {
     const found = await prisma.user.findUnique({ where: { id } });
     if (!found) return null;
 
-    return new User(found.id, found.userName, found.email, found.password);
+    return new User(found.userName, found.email, found.password, found.id);
   }
 }

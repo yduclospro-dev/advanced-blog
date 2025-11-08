@@ -33,56 +33,67 @@ export class ArticleController {
 
   async create(req: Request, res: Response) {
     const { title, author, content, imageUrl } = req.body;
+    const authorId = req.user?.id;
 
-    if (!title || !author || !content) {
-      return res.status(400).json({ error: "Champs requis manquants: title, author, et content sont obligatoires" });
+    if (!authorId) {
+      return res.status(401).json({ error: "Utilisateur non authentifié" });
+    }
+
+    if (!title || !content) {
+      return res.status(400).json({ error: "Champs requis manquants: title et content sont obligatoires" });
     }
 
     try {
       const createdArticle = await this.articleService.create(
         title,
         author,
+        authorId,
         content,
         imageUrl
       );
+
+      if (!createdArticle) {
+        return res.status(500).json({ error: "Échec de la création de l'article" });
+      }
+
       res.status(201).json(createdArticle);
     } catch {
       res.status(500).json({ error: "Erreur lors de la création de l'article" });
     }
   }
 
-  async update(req: Request, res: Response) {
-    const { id } = req.params;
-    const { title, content, imageUrl } = req.body;
+  // async update(req: Request, res: Response) {
+  //   const { id } = req.params;
+  //   const { title, content, imageUrl } = req.body;
 
-    try {
-      const updatedArticle = await this.articleService.update(id, {
-        title,
-        content,
-        imageUrl,
-      });
-      res.status(200).json(updatedArticle);
-    } catch (error) {
-      if ((error as Error).message === "Article non trouvé") {
-        return res.status(404).json({ error: "Article non trouvé" });
-      }
+  //   try {
+  //     const updatedArticle = await this.articleService.update(id, {
+  //       title,
+  //       content,
+  //       imageUrl,
+  //     });
+  //     res.status(200).json(updatedArticle);
+  //   } catch (error) {
+  //     if ((error as Error).message === "Article non trouvé") {
+  //       return res.status(404).json({ error: "Article non trouvé" });
+  //     }
       
-      res.status(500).json({ error: "Erreur lors de la mise à jour de l'article" });
-    }
-  }
+  //     res.status(500).json({ error: "Erreur lors de la mise à jour de l'article" });
+  //   }
+  // }
 
-  async delete(req: Request, res: Response) {
-    const { id } = req.params;
+  // async delete(req: Request, res: Response) {
+  //   const { id } = req.params;
 
-    try {
-      await this.articleService.delete(id);
-      res.status(204).send();
-    } catch (error) {
-      if ((error as Error).message === "Article non trouvé") {
-        return res.status(404).json({ error: "Article non trouvé" });
-      }
+  //   try {
+  //     await this.articleService.delete(id);
+  //     res.status(204).send();
+  //   } catch (error) {
+  //     if ((error as Error).message === "Article non trouvé") {
+  //       return res.status(404).json({ error: "Article non trouvé" });
+  //     }
       
-      res.status(500).json({ error: "Erreur lors de la suppression de l'article" });
-    }
-  }
+  //     res.status(500).json({ error: "Erreur lors de la suppression de l'article" });
+  //   }
+  // }
 }

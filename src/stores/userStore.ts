@@ -1,7 +1,7 @@
 import { create, StateCreator } from "zustand";
 import { persist } from "zustand/middleware";
 import { User } from "@/types/User";
-import axiosInstance from "../lib/axios";
+import axiosInstance from "../utils/axios";
 import { UserRole } from "@prisma/client";
 import axios from "axios";
 
@@ -16,11 +16,10 @@ interface UserState {
   users: User[];
   currentUser: AuthUser | null;
   token: string | null;
-  isAuthenticated: boolean;
   isLoading: boolean;
 
   initializeAuth: () => Promise<void>;
-  fetchCurrentUser: () => Promise<{ success: boolean; error?: string }>;
+  fetchCurrentUser: () => Promise<{ success: boolean; error?: string; user?: AuthUser }>;
   getAllUsers: () => User[];
   register: (userName: string, email: string, password: string) => Promise<{ success: boolean; error?: string }>;
   login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
@@ -31,20 +30,33 @@ const userStoreCreator: StateCreator<UserState, [], [], UserState> = (set, get) 
   users: [],
   currentUser: null,
   token: null,
-  isAuthenticated: false,
   isLoading: false,
 
   initializeAuth: async () => {
     const token = get().token;
     
     if (!token) {
-      set({ isLoading: false, isAuthenticated: false });
+      set({ isLoading: false });
       return;
     }
 
     set({ isLoading: true });
-    await get().fetchCurrentUser();
-    set({ isLoading: false });
+    const result = await get().fetchCurrentUser();
+    
+    if (!result.success) {
+      set({ 
+        token: null, 
+        currentUser: null, 
+        isLoading: false 
+      });
+      localStorage.removeItem('token-storage');
+      return;
+    }
+    
+    set({ 
+      currentUser: result.user,
+      isLoading: false 
+    });
   },
 
   fetchCurrentUser: async () => {
@@ -55,17 +67,15 @@ const userStoreCreator: StateCreator<UserState, [], [], UserState> = (set, get) 
         return { success: false, error: "Erreur lors de la récupération de l'utilisateur authentifié" };
       }
 
-      set({ 
-        currentUser: {
+      return { 
+        success: true, 
+        user: {
           id: response.data.id,
           email: response.data.email,
           userName: response.data.userName,
           role: response.data.role
-        },
-        isAuthenticated: true
-      });
-
-      return { success: true };
+        }
+      };
     } catch (err: unknown) {
       if (axios.isAxiosError(err)) {
         return { success: false, error: err.response?.data?.error || "Erreur lors de la récupération de l'utilisateur" };
@@ -106,14 +116,18 @@ const userStoreCreator: StateCreator<UserState, [], [], UserState> = (set, get) 
       const token = loginResponse.data.token;
       
       // Store token in state (will be persisted via middleware)
-      set({ token, isAuthenticated: false }); // Not authenticated yet until we fetch user data
+      set({ token });
 
       // Fetch current user with the new token
       const currentUserRequest = await get().fetchCurrentUser();
       if (!currentUserRequest.success) {
-        set({ token: null, isAuthenticated: false });
+        set({ token: null });
         return { success: false, error: currentUserRequest.error };
       }
+
+      set({ 
+        currentUser: currentUserRequest.user
+      });
 
       return { success: true };
     } catch (err: unknown) {
@@ -127,8 +141,7 @@ const userStoreCreator: StateCreator<UserState, [], [], UserState> = (set, get) 
   logout: () => {
     set({ 
       currentUser: null, 
-      token: null,
-      isAuthenticated: false 
+      token: null
     });
     
     // Manually remove from localStorage to ensure clean logout

@@ -8,7 +8,7 @@ import ClientOnly from "@/components/ClientOnly";
 
 export default function ArticlesListContainer() {
     const { articles, fetchArticles, isLoading } = useArticleStore();
-    const { isAuthenticated } = useUserStore();
+    const currentUser = useUserStore((state) => state.currentUser);
 
     useEffect(() => {
         fetchArticles();
@@ -27,7 +27,7 @@ export default function ArticlesListContainer() {
             ) : (
                 <ArticlesListPresenter 
                     articles={articles}
-                    isAuthenticated={isAuthenticated}
+                    isAuthenticated={!!currentUser}
                 />
             )}
         </ClientOnly>
