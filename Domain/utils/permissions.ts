@@ -2,7 +2,7 @@ import { UserRole } from '@prisma/client';
 
 /**
  * Vérifie si l'utilisateur est propriétaire de la ressource ou administrateur
- * Utilisé dans les controllers pour vérifier les permissions
+ * Utilisé pour vérifier les permissions de modification/suppression
  */
 export function isOwnerOrAdmin(userId: string, resourceOwnerId: string, userRole: UserRole): boolean {
     return userId === resourceOwnerId || userRole === UserRole.ADMIN;
