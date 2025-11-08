@@ -7,12 +7,12 @@ export class User {
   private _password: string;
   private _role: UserRole;
 
-  constructor(userName: string, email: string, password: string, id?: string) {
+  constructor(userName: string, email: string, password: string, role: UserRole = UserRole.USER, id?: string) {
     this._id = id;
     this._userName = userName;
     this._email = email;
     this._password = password;
-    this._role = UserRole.USER;
+    this._role = role;
   }
 
   get id(): string | undefined {

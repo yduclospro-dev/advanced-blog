@@ -18,6 +18,7 @@ export class UserRepository implements IUserRepository {
       created.userName,
       created.email,
       created.password,
+      created.role,
       created.id
     );
   }
@@ -25,13 +26,13 @@ export class UserRepository implements IUserRepository {
   async findByEmail(email: string): Promise<User | null> {
     const found = await prisma.user.findUnique({ where: { email } });
     if (!found) return null;
-    return new User(found.userName, found.email, found.password, found.id);
+    return new User(found.userName, found.email, found.password, found.role, found.id);
   }
 
   async findById(id: string): Promise<User | null> {
     const found = await prisma.user.findUnique({ where: { id } });
     if (!found) return null;
 
-    return new User(found.userName, found.email, found.password, found.id);
+    return new User(found.userName, found.email, found.password, found.role, found.id);
   }
 }

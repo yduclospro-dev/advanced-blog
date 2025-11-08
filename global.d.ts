@@ -1,5 +1,7 @@
 export {}
 
+import { UserRole } from '@prisma/client';
+
 declare global {
     namespace NodeJS {
         interface ProcessEnv {
@@ -16,7 +18,7 @@ declare global {
             user?: {
                 id: string;
                 email: string;
-                role: string;
+                role: UserRole;
             };
         }
     }
