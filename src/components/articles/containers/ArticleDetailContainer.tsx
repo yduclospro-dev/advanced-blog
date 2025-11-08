@@ -13,7 +13,7 @@ import ClientOnly from "@/components/ClientOnly";
 export default function ArticleDetailContainer() {
     const { id } = useParams();
     const router = useRouter();
-    const { getArticleById, deleteArticle, toggleArticleLike, toggleArticleDislike } = useArticleStore();
+    const { getArticleById, deleteArticle, toggleArticleLike, toggleArticleDislike, fetchArticles, isLoading } = useArticleStore();
     const { isAuthenticated, currentUser } = useUserStore();
     const { 
         getCommentsByArticle, 
@@ -32,12 +32,16 @@ export default function ArticleDetailContainer() {
     const isAuthor = !!(article && currentUser?.id === article.authorId);
 
     useEffect(() => {
+        fetchArticles();
+    }, [fetchArticles]);
+
+    useEffect(() => {
         document.body.style.overflow = showConfirm ? "hidden" : "auto";
     }, [showConfirm]);
 
-    const handleDelete = () => {
+    const handleDelete = async () => {
         if (article) {
-            deleteArticle(article.id);
+            await deleteArticle(article.id);
             setShowConfirm(false);
             setToast({ message: "Article supprimé avec succès !", type: "success" });
             
@@ -101,7 +105,7 @@ export default function ArticleDetailContainer() {
         toggleCommentDislike(commentId, currentUser.id);
     };
 
-    if (!article) {
+    if (isLoading || !article) {
         return (
             <ClientOnly fallback={
                 <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-slate-900">
@@ -109,7 +113,9 @@ export default function ArticleDetailContainer() {
                 </div>
             }>
                 <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-slate-900 transition-colors">
-                    <p className="text-center text-gray-500 dark:text-slate-400 text-lg">Article introuvable.</p>
+                    <p className="text-center text-gray-500 dark:text-slate-400 text-lg">
+                        {isLoading ? "Chargement de l'article..." : "Article introuvable."}
+                    </p>
                 </div>
             </ClientOnly>
         );

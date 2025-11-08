@@ -1,0 +1,54 @@
+### Test API Articles
+### Variables
+@baseUrl = http://localhost:3000/api
+@userId = votre-user-id-ici
+@articleId = article-id-ici
+
+### 1. Vérifier le statut de l'API
+GET {{baseUrl}}/status
+
+### 2. Récupérer tous les articles
+GET {{baseUrl}}/articles
+
+### 3. Créer un nouvel article
+POST {{baseUrl}}/articles
+Content-Type: application/json
+
+{
+  "title": "Mon premier article via Prisma",
+  "author": "Test User",
+  "authorId": "{{userId}}",
+  "content": "Ceci est le contenu de mon premier article stocké dans PostgreSQL via Prisma !",
+  "imageUrl": "https://example.com/image.jpg"
+}
+
+### 4. Récupérer un article par ID
+GET {{baseUrl}}/articles/{{articleId}}
+
+### 5. Mettre à jour un article
+PUT {{baseUrl}}/articles/{{articleId}}
+Content-Type: application/json
+
+{
+  "title": "Mon article mis à jour",
+  "content": "Contenu mis à jour !"
+}
+
+### 6. Liker un article
+POST {{baseUrl}}/articles/{{articleId}}/like
+Content-Type: application/json
+
+{
+  "userId": "{{userId}}"
+}
+
+### 7. Disliker un article
+POST {{baseUrl}}/articles/{{articleId}}/dislike
+Content-Type: application/json
+
+{
+  "userId": "{{userId}}"
+}
+
+### 8. Supprimer un article
+DELETE {{baseUrl}}/articles/{{articleId}}
