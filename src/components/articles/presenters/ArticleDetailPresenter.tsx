@@ -4,7 +4,6 @@ import ConfirmModal from "@/components/ConfirmModal";
 import { Button, ButtonLink, Card, LikeDislikeButtons } from "@/components/ui";
 import CommentsListContainer from "../comments/containers/CommentsListContainer";
 import CommentFormContainer from "../comments/containers/CommentFormContainer";
-import { isValidImageDataUrl } from "@/utils/imageValidation";
 import Image from "next/image";
 
 interface ArticleDetailPresenterProps {
@@ -47,7 +46,7 @@ export default function ArticleDetailPresenter({
     onCommentDislike,
 }: ArticleDetailPresenterProps) {
     return (
-        <div className="bg-gradient-to-b from-gray-50 to-white dark:from-slate-900 dark:to-slate-800 min-h-screen py-16 px-6 md:px-20 lg:px-32 transition-colors">
+        <div className="bg-linear-to-b from-gray-50 to-white dark:from-slate-900 dark:to-slate-800 min-h-screen py-16 px-6 md:px-20 lg:px-32 transition-colors">
             <Card variant="default" padding="lg" className="max-w-3xl mx-auto relative">
                 <div className="mb-6 flex items-center justify-between">
                     <Button
@@ -102,7 +101,7 @@ export default function ArticleDetailPresenter({
                         </span>
                     </div>
 
-                    {article.imageUrl && isValidImageDataUrl(article.imageUrl) && (
+                    {article.imageUrl && (
                         <div className="mb-8 rounded-lg overflow-hidden relative w-full h-96">
                             <Image 
                                 src={article.imageUrl} 

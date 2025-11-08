@@ -10,7 +10,8 @@ export class ArticleRepository implements IArticleRepository {
       data: {
         title: article.title,
         authorId: article.authorId,
-        content: article.content
+        content: article.content,
+        imageUrl: article.imageUrl
       },
       include: {
         user: true,
@@ -23,7 +24,8 @@ export class ArticleRepository implements IArticleRepository {
       created.authorId,
       created.date.toISOString().split('T')[0],
       created.content,
-      created.id,
+      created.imageUrl || undefined,
+      created.id
     );
   }
 
@@ -40,12 +42,13 @@ export class ArticleRepository implements IArticleRepository {
     return articles.map(
       (a) =>
         new Article(
-          a.id,
           a.title,
           a.user.userName,
           a.authorId,
           a.date.toISOString().split('T')[0],
-          a.content
+          a.content,
+          a.imageUrl || undefined,
+          a.id
         )
     );
   }
@@ -60,12 +63,13 @@ export class ArticleRepository implements IArticleRepository {
     if (!found) return null;
 
     return new Article(
-      found.id,
       found.title,
       found.user.userName,
       found.authorId,
       found.date.toISOString().split('T')[0],
-      found.content
+      found.content,
+      found.imageUrl || undefined,
+      found.id
     );
   }
 
@@ -75,6 +79,7 @@ export class ArticleRepository implements IArticleRepository {
       data: {
         ...(articleData.title && { title: articleData.title }),
         ...(articleData.content && { content: articleData.content }),
+        ...(articleData.imageUrl !== undefined && { imageUrl: articleData.imageUrl }),
       },
       include: {
         user: true,
@@ -87,7 +92,8 @@ export class ArticleRepository implements IArticleRepository {
       updated.authorId,
       updated.date.toISOString().split('T')[0],
       updated.content,
-      updated.id,
+      updated.imageUrl || undefined,
+      updated.id
     );
   }
 

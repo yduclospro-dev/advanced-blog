@@ -3,13 +3,6 @@ export const MAX_FILE_SIZE_MB = 5;
 
 export const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
 
-export const isValidImageDataUrl = (url: string): boolean => {
-    if (!url) return false;
-
-    const dataUrlRegex = /^data:image\/(jpeg|png|gif|webp);base64,/i;
-    return dataUrlRegex.test(url);
-};
-
 export const validateImageFile = (file: File): { isValid: boolean; error?: string } => {
     if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
         return {
@@ -26,13 +19,4 @@ export const validateImageFile = (file: File): { isValid: boolean; error?: strin
     }
 
     return { isValid: true };
-};
-
-export const isQuotaExceededError = (error: unknown): boolean => {
-    return error instanceof DOMException && (
-        error.code === 22 ||
-        error.code === 1014 ||
-        error.name === 'QuotaExceededError' ||
-        error.name === 'NS_ERROR_DOM_QUOTA_REACHED'
-    );
 };

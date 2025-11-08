@@ -3,8 +3,9 @@
 import { useRef, useState } from "react";
 import { ImageUploadProps } from "./imageUploadTypes";
 import Button from "../Button/Button";
-import { validateImageFile, isValidImageDataUrl, MAX_FILE_SIZE_MB } from "@/utils/imageValidation";
+import { validateImageFile, MAX_FILE_SIZE_MB } from "@/utils/imageValidation";
 import Image from "next/image";
+import axios from "@/utils/axios";
 
 export default function ImageUpload({
     value,
@@ -15,6 +16,7 @@ export default function ImageUpload({
 }: ImageUploadProps) {
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [isUploading, setIsUploading] = useState(false);
+    const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
     const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
@@ -29,32 +31,36 @@ export default function ImageUpload({
         setIsUploading(true);
 
         try {
+            // Créer un preview local
             const reader = new FileReader();
             reader.onload = (e) => {
-                const base64String = e.target?.result as string;
-
-                if (!isValidImageDataUrl(base64String)) {
-                    onError?.('Format d\'image non valide.');
-                    setIsUploading(false);
-                    return;
-                }
-
-                onChange(base64String);
-                setIsUploading(false);
-            };
-            reader.onerror = () => {
-                onError?.('Erreur lors du chargement de l\'image.');
-                setIsUploading(false);
+                setPreviewUrl(e.target?.result as string);
             };
             reader.readAsDataURL(file);
-        } catch {
-            onError?.('Erreur lors du chargement de l\'image.');
+
+            // Upload vers Cloudinary via le backend
+            const formData = new FormData();
+            formData.append('image', file);
+
+            const response = await axios.post('/upload/image', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
+
+            const { imageUrl } = response.data;
+            onChange(imageUrl);
+            setIsUploading(false);
+        } catch (error) {
+            onError?.(error instanceof Error ? error.message : 'Erreur lors de l\'upload de l\'image.');
+            setPreviewUrl(null);
             setIsUploading(false);
         }
     };
 
     const handleRemoveImage = () => {
         onChange(null);
+        setPreviewUrl(null);
         if (fileInputRef.current) {
             fileInputRef.current.value = '';
         }
@@ -63,6 +69,8 @@ export default function ImageUpload({
     const handleButtonClick = () => {
         fileInputRef.current?.click();
     };
+
+    const displayImage = value || previewUrl;
 
     return (
         <div className={`space-y-4 ${className}`}>
@@ -74,11 +82,11 @@ export default function ImageUpload({
                 className="hidden"
             />
 
-            {value && isValidImageDataUrl(value) ? (
+            {displayImage ? (
                 <div className="relative group">
                     <div className="relative w-full h-48 rounded-lg border-2 border-gray-200 dark:border-slate-600 overflow-hidden">
                         <Image
-                            src={value}
+                            src={displayImage}
                             alt="Preview"
                             fill
                             className="object-cover"
@@ -91,12 +99,13 @@ export default function ImageUpload({
                                 variant="primary"
                                 onClick={handleButtonClick}
                                 disabled={isUploading}
-                                label="Changer"
+                                label={isUploading ? "Upload..." : "Changer"}
                                 className="text-sm"
                             />
                             <Button
                                 variant="danger"
                                 onClick={handleRemoveImage}
+                                disabled={isUploading}
                                 label="Supprimer"
                                 className="text-sm"
                             />
@@ -124,7 +133,7 @@ export default function ImageUpload({
                                 variant="outline"
                                 onClick={handleButtonClick}
                                 disabled={isUploading}
-                                label={isUploading ? "Chargement..." : placeholder}
+                                label={isUploading ? "Upload en cours..." : placeholder}
                             />
                             <p className="text-sm text-gray-500 dark:text-slate-400 mt-2">
                                     PNG, JPG, JPEG, GIF, WebP jusqu&#39;à {MAX_FILE_SIZE_MB}MB

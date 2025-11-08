@@ -47,7 +47,7 @@ export default function ArticlesListPresenter({
                     <Link 
                         key={article.id}
                         href={`/articles/${article.id}`}
-                        className="w-[90%] sm:w-[85%] md:w-[100%]"
+                        className="w-[90%] sm:w-[85%] md:w-full"
                     >
                         <ArticleCard article={article} />
                     </Link>

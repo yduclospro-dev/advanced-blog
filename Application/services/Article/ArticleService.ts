@@ -12,14 +12,14 @@ export class ArticleService {
 
   async create(
     title: string,
-    author: string,
     authorId: string,
     content: string,
     imageUrl?: string
   ): Promise<CreateArticleDto> {
+    // On ne prend plus "author" en paramètre, on le récupérera du repository avec l'authorId
     const article = new Article(
       title,
-      author,
+      "", // author sera rempli par le repository après récupération du user
       authorId,
       new Date().toISOString().split("T")[0],
       content,
@@ -54,11 +54,22 @@ export class ArticleService {
       title: article.title,
       author: article.author,
       content: article.content,
+      date: article.date,
+      imageUrl: article.imageUrl
     };
   }
 
-  async findAll(): Promise<Article[]> {
-    return await this._articleRepository.findAll();
+  async findAll(): Promise<DisplayArticleDto[]> {
+    const articles = await this._articleRepository.findAll();
+
+    return articles.map(article => ({
+      id: article.id as string,
+      title: article.title,
+      author: article.author,
+      content: article.content,
+      imageUrl: article.imageUrl,
+      date: article.date
+    }));
   }
 
   // async update(

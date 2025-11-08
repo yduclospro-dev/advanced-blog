@@ -32,7 +32,7 @@ export class ArticleController {
   }
 
   async create(req: Request, res: Response) {
-    const { title, author, content, imageUrl } = req.body;
+    const { title, content, imageUrl } = req.body;
     const authorId = req.user?.id;
 
     if (!authorId) {
@@ -46,7 +46,6 @@ export class ArticleController {
     try {
       const createdArticle = await this.articleService.create(
         title,
-        author,
         authorId,
         content,
         imageUrl
