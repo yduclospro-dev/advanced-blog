@@ -2,6 +2,7 @@ import type { IUserRepository } from "../../../Domain/repositories/IUserReposito
 import { User } from "../../../Domain/entities/User.ts";
 import type { UserDto } from "../../dtos/UserDto.ts";
 import bcrypt from "bcryptjs";
+import { ConflictError, BadRequestError, UnauthorizedError } from "../../../Domain/errors/index.ts";
 
 export class UserService {
   private userRepository: IUserRepository;
@@ -13,12 +14,12 @@ export class UserService {
   async register(userName: string, email: string, password: string): Promise<UserDto> {
     const existing = await this.userRepository.findByEmail(email);
     if (existing) {
-      throw new Error("L'email de l'utilisateur existe déjà");
+      throw new ConflictError("L'email de l'utilisateur existe déjà");
     }
 
     const user = new User(userName, email, password);
     if (!user.isPasswordValid()) {
-      throw new Error("Le mot de passe doit contenir au moins 6 caractères");
+      throw new BadRequestError("Le mot de passe doit contenir au moins 6 caractères");
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -41,13 +42,13 @@ export class UserService {
     const user = await this.userRepository.findByEmail(email);
 
     if (!user) {
-      throw new Error("Utilisateur introuvable");
+      throw new UnauthorizedError("Identifiants incorrects");
     }
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
 
     if (!isPasswordValid) {
-      throw new Error("Mot de passe incorrect");
+      throw new UnauthorizedError("Identifiants incorrects");
     }
 
     return {

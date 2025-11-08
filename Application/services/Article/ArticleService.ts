@@ -4,6 +4,7 @@ import { DisplayArticleDto } from "../../dtos/Article/DisplayArticleDto.ts";
 import { CreateArticleDto } from "../../dtos/Article/CreateArticleDto.ts";
 import { UserRole } from "@prisma/client";
 import { isOwnerOrAdmin } from "../../../WebApi/middleware/authorize.ts";
+import { BadRequestError, NotFoundError, ForbiddenError } from "../../../Domain/errors/index.ts";
 
 export class ArticleService {
   private _articleRepository: IArticleRepository;
@@ -29,7 +30,7 @@ export class ArticleService {
     );
 
     if (!article.isValidForCreation()) {
-      throw new Error("Les données de l'article sont invalides");
+      throw new BadRequestError("Les données de l'article sont invalides");
     }
 
     const createdArticle = await this._articleRepository.create(article);
@@ -49,7 +50,7 @@ export class ArticleService {
 
   async findById(id: string): Promise<DisplayArticleDto | null> {
     const article = await this._articleRepository.findById(id);
-    if (!article) throw new Error("Article non trouvé");
+    if (!article) throw new NotFoundError("Article non trouvé");
 
     return {
       id: article.id as string,
@@ -85,11 +86,11 @@ export class ArticleService {
     const article = await this._articleRepository.findById(id);
     
     if (!article) {
-      throw new Error("Article non trouvé");
+      throw new NotFoundError("Article non trouvé");
     }
 
     if (!isOwnerOrAdmin(userId, article.authorId, userRole)) {
-      throw new Error("Non autorisé à modifier cet article");
+      throw new ForbiddenError("Non autorisé à modifier cet article");
     }
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -115,11 +116,11 @@ export class ArticleService {
     const article = await this._articleRepository.findById(id);
     
     if (!article) {
-      throw new Error("Article non trouvé");
+      throw new NotFoundError("Article non trouvé");
     }
 
     if (!isOwnerOrAdmin(userId, article.authorId, userRole)) {
-      throw new Error("Non autorisé à supprimer cet article");
+      throw new ForbiddenError("Non autorisé à supprimer cet article");
     }
 
     await this._articleRepository.delete(id);
