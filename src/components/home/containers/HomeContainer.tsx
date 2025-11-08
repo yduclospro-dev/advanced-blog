@@ -4,10 +4,12 @@ import { useUserStore } from "@/stores/userStore";
 import { useArticleStore } from "@/stores/articlesStore";
 import HomePresenter from "../presenters/HomePresenter";
 import ClientOnly from "@/components/ClientOnly";
+import { useUiStore } from "@/stores/uiStore";
 
 export default function HomeContainer() {
   const currentUser = useUserStore((state) => state.currentUser);
-  const { getLatestArticles, fetchArticles, isLoading } = useArticleStore();
+  const { getLatestArticles, fetchArticles } = useArticleStore();
+  const isLoading = useUiStore((state) => state.isLoading('articles'));
 
   useEffect(() => {
     fetchArticles();
