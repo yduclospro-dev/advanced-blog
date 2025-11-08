@@ -3,5 +3,6 @@ import { User } from "../entities/User.ts";
 export interface IUserRepository {
   create(user: User): Promise<User>;
   findByEmail(email: string): Promise<User | null>;
+  findByUserName(userName: string): Promise<User | null>;
   findById(id: string): Promise<User | null>;
 }
