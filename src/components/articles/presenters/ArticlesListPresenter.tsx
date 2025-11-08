@@ -6,11 +6,19 @@ import { ButtonLink } from "@/components/ui";
 interface ArticlesListPresenterProps {
     articles: Article[];
     isAuthenticated: boolean;
+    currentUserId?: string;
+    currentUserRole?: string;
+    onEditArticle: (id: string) => void;
+    onDeleteArticle: (id: string) => void;
 }
 
 export default function ArticlesListPresenter({ 
     articles, 
-    isAuthenticated 
+    isAuthenticated,
+    currentUserId,
+    currentUserRole,
+    onEditArticle,
+    onDeleteArticle
 }: ArticlesListPresenterProps) {
     return (
         <div className="bg-gray-50 dark:bg-slate-900 min-h-screen py-16 px-10 md:px-20 lg:px-32 transition-colors">
@@ -43,15 +51,26 @@ export default function ArticlesListPresenter({
             </div>
 
             <div className="max-w-6xl mx-auto grid gap-12 sm:grid-cols-2 lg:grid-cols-3 justify-items-center">
-                {articles.map((article) => (
-                    <Link 
-                        key={article.id}
-                        href={`/articles/${article.id}`}
-                        className="w-[90%] sm:w-[85%] md:w-full"
-                    >
-                        <ArticleCard article={article} />
-                    </Link>
-                ))}
+                {articles.map((article) => {
+                    const isAuthor = currentUserId === article.authorId;
+                    const isAdmin = currentUserRole === 'ADMIN';
+                    const canManage = isAuthor || isAdmin;
+
+                    return (
+                        <Link 
+                            key={article.id}
+                            href={`/articles/${article.id}`}
+                            className="w-[90%] sm:w-[85%] md:w-full"
+                        >
+                            <ArticleCard 
+                                article={article}
+                                canManage={canManage}
+                                onEdit={onEditArticle}
+                                onDelete={onDeleteArticle}
+                            />
+                        </Link>
+                    );
+                })}
             </div>
         </div>
     );
