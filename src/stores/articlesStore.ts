@@ -2,8 +2,9 @@
 
 import { create } from "zustand";
 import { Article } from "@/types/Article";
+import axios from "@/utils/axios";
 
-const API_URL = "/api/articles";
+const API_URL = "/articles";
 
 interface ArticleStore {
     articles: Article[];
@@ -12,12 +13,12 @@ interface ArticleStore {
     fetchArticles: () => Promise<void>;
     getArticleById: (id: string) => Article | undefined;
     getLatestArticles: (limit: number) => Article[];
-    addArticle: (articleData: Omit<Article, "id" | "date" | "authorId">) => Promise<void>;
+    addArticle: (articleData: Omit<Article, "id" | "date" | "author" | "authorId">) => Promise<void>;
     updateArticle: (id: string, updatedData: Partial<Article>) => Promise<void>;
     deleteArticle: (id: string) => Promise<void>;
     toggleArticleLike: (articleId: string, userId: string) => void;
     toggleArticleDislike: (articleId: string, userId: string) => void;
-    safeAddArticle: (articleData: Omit<Article, "id" | "date" | "authorId">) => Promise<void>;
+    safeAddArticle: (articleData: Omit<Article, "id" | "date" | "author" | "authorId">) => Promise<void>;
     safeUpdateArticle: (id: string, updatedData: Partial<Article>) => Promise<void>;
 }
 
@@ -29,9 +30,8 @@ export const useArticleStore = create<ArticleStore>()((set, get) => ({
     fetchArticles: async () => {
         set({ isLoading: true, error: null });
         try {
-            const response = await fetch(API_URL);
-            if (!response.ok) throw new Error("Erreur lors de la récupération des articles");
-            const articles = await response.json();
+            const response = await axios.get(API_URL);
+            const articles = response.data;
             
             const articlesWithLikes = articles.map((article: Article) => ({
                 ...article,
@@ -57,23 +57,19 @@ export const useArticleStore = create<ArticleStore>()((set, get) => ({
     addArticle: async (articleData) => {
         set({ isLoading: true, error: null });
         try {
-            const response = await fetch(API_URL, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    title: articleData.title.trim(),
-                    author: articleData.author.trim(),
-                    content: articleData.content.trim(),
-                    imageUrl: articleData.imageUrl,
-                }),
-            });
+            const payload: { title: string; content: string; imageUrl?: string } = {
+                title: articleData.title.trim(),
+                content: articleData.content.trim(),
+            };
 
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.error || "Erreur lors de la création de l'article");
+            // N'ajouter imageUrl que s'il est défini et non vide
+            if (articleData.imageUrl && articleData.imageUrl.trim() !== "") {
+                payload.imageUrl = articleData.imageUrl.trim();
             }
 
-            const newArticle = await response.json();
+            const response = await axios.post(API_URL, payload);
+
+            const newArticle = response.data;
             const articleWithLikes = {
                 ...newArticle,
                 likes: [],
@@ -93,19 +89,13 @@ export const useArticleStore = create<ArticleStore>()((set, get) => ({
     updateArticle: async (id, updatedData) => {
         set({ isLoading: true, error: null });
         try {
-            const response = await fetch(`${API_URL}/${id}`, {
-                method: "PUT",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    ...(updatedData.title && { title: updatedData.title.trim() }),
-                    ...(updatedData.content && { content: updatedData.content.trim() }),
-                    ...(updatedData.imageUrl !== undefined && { imageUrl: updatedData.imageUrl }),
-                }),
+            const response = await axios.put(`${API_URL}/${id}`, {
+                ...(updatedData.title && { title: updatedData.title.trim() }),
+                ...(updatedData.content && { content: updatedData.content.trim() }),
+                ...(updatedData.imageUrl !== undefined && { imageUrl: updatedData.imageUrl }),
             });
 
-            if (!response.ok) throw new Error("Erreur lors de la mise à jour de l'article");
-
-            const updatedArticle = await response.json();
+            const updatedArticle = response.data;
             const currentArticle = get().articles.find(a => a.id === id);
             
             set({
@@ -127,11 +117,7 @@ export const useArticleStore = create<ArticleStore>()((set, get) => ({
     deleteArticle: async (id) => {
         set({ isLoading: true, error: null });
         try {
-            const response = await fetch(`${API_URL}/${id}`, {
-                method: "DELETE",
-            });
-
-            if (!response.ok) throw new Error("Erreur lors de la suppression de l'article");
+            await axios.delete(`${API_URL}/${id}`);
 
             localStorage.removeItem(`article-${id}-likes`);
             localStorage.removeItem(`article-${id}-dislikes`);

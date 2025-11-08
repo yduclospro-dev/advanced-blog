@@ -13,6 +13,7 @@ export class Article {
     authorId: string,
     date: string,
     content: string,
+    imageUrl?: string,
     id?: string
   ) {
     this._id = id;
@@ -21,6 +22,7 @@ export class Article {
     this._authorId = authorId;
     this._date = date;
     this._content = content;
+    this._imageUrl = imageUrl;
   }
 
   get id(): string | undefined {
@@ -53,7 +55,7 @@ export class Article {
     return (
       this._title.trim().length > 0 &&
       this._content.trim().length > 0 &&
-      this._author.trim().length > 0
+      this._authorId.trim().length > 0
     );
   }
 }

@@ -26,6 +26,7 @@ model Article {
   title     String
   authorId  String
   content   String
+  imageUrl  String?
   date      DateTime @default(now())
   user      User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
 }
