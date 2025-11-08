@@ -2,6 +2,8 @@ import { Article } from "../../../Domain/entities/Article.ts";
 import type { IArticleRepository } from "../../../Domain/repositories/IArticleRepository.ts";
 import { DisplayArticleDto } from "../../dtos/Article/DisplayArticleDto.ts";
 import { CreateArticleDto } from "../../dtos/Article/CreateArticleDto.ts";
+import { UserRole } from "@prisma/client";
+import { isOwnerOrAdmin } from "../../../WebApi/middleware/authorize.ts";
 
 export class ArticleService {
   private _articleRepository: IArticleRepository;
@@ -53,6 +55,7 @@ export class ArticleService {
       id: article.id as string,
       title: article.title,
       author: article.author,
+      authorId: article.authorId,
       content: article.content,
       date: article.date,
       imageUrl: article.imageUrl
@@ -66,37 +69,59 @@ export class ArticleService {
       id: article.id as string,
       title: article.title,
       author: article.author,
+      authorId: article.authorId,
       content: article.content,
       imageUrl: article.imageUrl,
       date: article.date
     }));
   }
 
-  // async update(
-  //   id: string,
-  //   updates: { title?: string; content?: string; imageUrl?: string }
-  // ): Promise<Article> {
-  //   const article = await this._articleRepository.findById(id);
+  async update(
+    id: string,
+    userId: string,
+    userRole: UserRole,
+    updates: { title?: string; content?: string; imageUrl?: string }
+  ): Promise<DisplayArticleDto> {
+    const article = await this._articleRepository.findById(id);
     
-  //   if (!article) {
-  //     throw new Error("Article non trouvé");
-  //   }
+    if (!article) {
+      throw new Error("Article non trouvé");
+    }
 
-  //   const updatedData: Partial<Article> = {};
-  //   if (updates.title) updatedData.title = updates.title.trim();
-  //   if (updates.content) updatedData.content = updates.content.trim();
-  //   if (updates.imageUrl !== undefined) updatedData.imageUrl = updates.imageUrl;
+    if (!isOwnerOrAdmin(userId, article.authorId, userRole)) {
+      throw new Error("Non autorisé à modifier cet article");
+    }
 
-  //   return await this._articleRepository.update(id, updatedData);
-  // }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const updatedData: any = {};
+    if (updates.title) updatedData.title = updates.title.trim();
+    if (updates.content) updatedData.content = updates.content.trim();
+    if (updates.imageUrl !== undefined) updatedData.imageUrl = updates.imageUrl;
 
-  // async delete(id: string): Promise<void> {
-  //   const article = await this._articleRepository.findById(id);
+    const updated = await this._articleRepository.update(id, updatedData);
+
+    return {
+      id: updated.id as string,
+      title: updated.title,
+      author: updated.author,
+      authorId: updated.authorId,
+      content: updated.content,
+      date: updated.date,
+      imageUrl: updated.imageUrl
+    };
+  }
+
+  async delete(id: string, userId: string, userRole: UserRole): Promise<void> {
+    const article = await this._articleRepository.findById(id);
     
-  //   if (!article) {
-  //     throw new Error("Article non trouvé");
-  //   }
+    if (!article) {
+      throw new Error("Article non trouvé");
+    }
 
-  //   await this._articleRepository.delete(id);
-  // }
+    if (!isOwnerOrAdmin(userId, article.authorId, userRole)) {
+      throw new Error("Non autorisé à supprimer cet article");
+    }
+
+    await this._articleRepository.delete(id);
+  }
 }
