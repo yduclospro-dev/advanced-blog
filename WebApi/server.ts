@@ -1,6 +1,7 @@
 import express from "express";
 import next from "next";
 import apiRouter from "./routes/apiRouter.ts";
+import { errorHandler } from "./middleware/errorHandler.ts";
 
 const dev = process.env.NODE_ENV !== "production";
 const nextApp = next({ dev });
@@ -12,6 +13,9 @@ nextApp.prepare().then(() => {
   app.use(express.json());
 
   app.use("/api", apiRouter);
+
+  // Middleware de gestion d'erreurs (doit être après toutes les routes)
+  app.use(errorHandler);
 
   app.use((req, res) => handle(req, res));
 
