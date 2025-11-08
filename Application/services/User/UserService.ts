@@ -12,9 +12,14 @@ export class UserService {
   }
 
   async register(userName: string, email: string, password: string): Promise<UserDto> {
-    const existing = await this.userRepository.findByEmail(email);
-    if (existing) {
+    const existingEmail = await this.userRepository.findByEmail(email);
+    if (existingEmail) {
       throw new ConflictError("L'email de l'utilisateur existe déjà");
+    }
+
+    const existingUserName = await this.userRepository.findByUserName(userName);
+    if (existingUserName) {
+      throw new ConflictError("Le nom d'utilisateur existe déjà");
     }
 
     const user = new User(userName, email, password);
@@ -41,13 +46,7 @@ export class UserService {
   async verifyCredentials(email: string, password: string): Promise<UserDto> {
     const user = await this.userRepository.findByEmail(email);
 
-    if (!user) {
-      throw new UnauthorizedError("Identifiants incorrects");
-    }
-
-    const isPasswordValid = await bcrypt.compare(password, user.password);
-
-    if (!isPasswordValid) {
+    if (!user || !(await bcrypt.compare(password, user.password))) {
       throw new UnauthorizedError("Identifiants incorrects");
     }
 
