@@ -3,6 +3,7 @@ import express from "express";
 import next from "next";
 import cors from "cors";
 import apiRouter from "./routes/apiRouter.ts";
+import cookieParser from 'cookie-parser';
 import { errorHandler } from "./middleware/errorHandler.ts";
 
 const dev = process.env.NODE_ENV !== "production";
@@ -13,6 +14,7 @@ const port = Number(process.env.PORT || 3000);
 // Create and export the express app synchronously so tests can import it.
 export const app = express();
 app.use(express.json());
+app.use(cookieParser());
 
 // Autorise les requêtes du front (localhost:3000)
 app.use(cors({
