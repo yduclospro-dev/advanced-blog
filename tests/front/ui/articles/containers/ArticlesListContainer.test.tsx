@@ -27,11 +27,16 @@ const mockArticles: Article[] = [
 ]
 
 const mockArticleStore = {
-  articles: mockArticles
+  articles: mockArticles,
+  fetchArticles: jest.fn(),
+  deleteArticle: jest.fn(),
 }
 
-const mockUserStore = {
-  isAuthenticated: true
+type MockUser = { id: string; userName: string; role: string } | null
+
+const mockUserStore: { isAuthenticated: boolean; currentUser: MockUser } = {
+  isAuthenticated: true,
+  currentUser: { id: 'user1', userName: 'User1', role: 'user' }
 }
 
 jest.mock('@/stores/articlesStore', () => ({
@@ -39,7 +44,7 @@ jest.mock('@/stores/articlesStore', () => ({
 }))
 
 jest.mock('@/stores/userStore', () => ({
-  useUserStore: () => mockUserStore
+  useUserStore: (selector?: (s: typeof mockUserStore) => unknown) => (typeof selector === 'function' ? selector(mockUserStore) : mockUserStore)
 }))
 
 jest.mock('@/components/articles/presenters/ArticlesListPresenter', () => ({
@@ -61,6 +66,7 @@ describe('ArticlesListContainer', () => {
   beforeEach(() => {
     mockArticleStore.articles = mockArticles
     mockUserStore.isAuthenticated = true
+    mockUserStore.currentUser = { id: 'user1', userName: 'User1', role: 'user' }
   })
 
   describe('Rendering', () => {
@@ -129,6 +135,7 @@ describe('ArticlesListContainer', () => {
     it('should pass authentication status to presenter when authenticated', () => {
       // Arrange
       mockUserStore.isAuthenticated = true
+      mockUserStore.currentUser = { id: 'user1', userName: 'User1', role: 'user' }
 
       // Act
       render(<ArticlesListContainer />)
@@ -140,6 +147,7 @@ describe('ArticlesListContainer', () => {
     it('should pass authentication status to presenter when not authenticated', () => {
       // Arrange
       mockUserStore.isAuthenticated = false
+      mockUserStore.currentUser = null
 
       // Act
       render(<ArticlesListContainer />)
@@ -169,7 +177,8 @@ describe('ArticlesListContainer', () => {
       expect(screen.getByTestId('is-authenticated')).toHaveTextContent('authenticated')
 
       // Act
-      mockUserStore.isAuthenticated = false
+  mockUserStore.isAuthenticated = false
+  mockUserStore.currentUser = null
       rerender(<ArticlesListContainer />)
 
       // Assert
@@ -245,6 +254,7 @@ describe('ArticlesListContainer', () => {
       // Arrange
       mockArticleStore.articles = mockArticles
       mockUserStore.isAuthenticated = false
+      mockUserStore.currentUser = null
 
       // Act
       render(<ArticlesListContainer />)

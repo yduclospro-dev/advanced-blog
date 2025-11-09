@@ -1,4 +1,5 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+import { act } from 'react'
 import '@testing-library/jest-dom'
 import NewArticleContainer from '@/components/articles/containers/NewArticleContainer'
 
@@ -169,7 +170,9 @@ describe('NewArticleContainer', () => {
 
       // Act
       fireEvent.change(contentInput, { target: { value: 'Content only' } })
-      fireEvent.click(saveButton)
+      act(() => {
+        fireEvent.click(saveButton)
+      })
 
       // Assert
       const toast = screen.getByTestId('toast')
@@ -186,7 +189,9 @@ describe('NewArticleContainer', () => {
 
       // Act
       fireEvent.change(titleInput, { target: { value: 'Title only' } })
-      fireEvent.click(saveButton)
+      act(() => {
+        fireEvent.click(saveButton)
+      })
 
       // Assert
       const toast = screen.getByTestId('toast')
@@ -201,7 +206,9 @@ describe('NewArticleContainer', () => {
       const saveButton = screen.getByTestId('save-button')
 
       // Act
-      fireEvent.click(saveButton)
+      act(() => {
+        fireEvent.click(saveButton)
+      })
 
       // Assert
       const toast = screen.getByTestId('toast')
@@ -222,7 +229,9 @@ describe('NewArticleContainer', () => {
       // Act
       fireEvent.change(titleInput, { target: { value: 'New Article Title' } })
       fireEvent.change(contentInput, { target: { value: 'New Article Content' } })
-      fireEvent.click(saveButton)
+      act(() => {
+        fireEvent.click(saveButton)
+      })
 
       // Assert
       expect(mockAddArticle).toHaveBeenCalledWith({
@@ -244,7 +253,9 @@ describe('NewArticleContainer', () => {
       // Act
       fireEvent.change(titleInput, { target: { value: 'Title' } })
       fireEvent.change(contentInput, { target: { value: 'Content' } })
-      fireEvent.click(saveButton)
+      act(() => {
+        fireEvent.click(saveButton)
+      })
 
       await waitFor(() => {
         const toast = screen.getByTestId('toast')
@@ -291,7 +302,9 @@ describe('NewArticleContainer', () => {
       const cancelButton = screen.getByTestId('cancel-button')
 
       // Act
-      fireEvent.click(cancelButton)
+      act(() => {
+        fireEvent.click(cancelButton)
+      })
 
       // Assert
       expect(mockPush).toHaveBeenCalledWith('/articles')
@@ -307,7 +320,9 @@ describe('NewArticleContainer', () => {
       // Act
       fireEvent.change(titleInput, { target: { value: 'Title' } })
       fireEvent.change(contentInput, { target: { value: 'Content' } })
-      fireEvent.click(cancelButton)
+      act(() => {
+        fireEvent.click(cancelButton)
+      })
 
       // Assert
       expect(mockAddArticle).not.toHaveBeenCalled()

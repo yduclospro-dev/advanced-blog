@@ -24,7 +24,7 @@ describe('useArticleStore', () => {
   })
 
   describe('addArticle', () => {
-    it('should add a new article with generated id, date, and empty likes/dislikes', () => {
+  it('should add a new article with generated id, date, and empty likes/dislikes', async () => {
       // Arrange
       const newArticleData = {
         title: 'Test Article',
@@ -34,8 +34,8 @@ describe('useArticleStore', () => {
       }
       
       // Act
-      act(() => {
-        useArticleStore.getState().addArticle(newArticleData)
+      await act(async () => {
+        await useArticleStore.getState().addArticle(newArticleData)
       })
       
       // Assert
@@ -48,7 +48,7 @@ describe('useArticleStore', () => {
       expect(articles[0].dislikes).toEqual([])
     })
 
-    it('should add multiple articles with unique ids', () => {
+  it('should add multiple articles with unique ids', async () => {
       // Arrange
       const article1 = {
         title: 'Article 1',
@@ -64,9 +64,9 @@ describe('useArticleStore', () => {
       }
       
       // Act
-      act(() => {
-        useArticleStore.getState().addArticle(article1)
-        useArticleStore.getState().addArticle(article2)
+      await act(async () => {
+        await useArticleStore.getState().addArticle(article1)
+        await useArticleStore.getState().addArticle(article2)
       })
       
       // Assert
@@ -77,7 +77,7 @@ describe('useArticleStore', () => {
   })
 
   describe('updateArticle', () => {
-    it('should update an existing article', () => {
+  it('should update an existing article', async () => {
       // Arrange
       const article: Article = {
         id: 'article-1',
@@ -97,8 +97,8 @@ describe('useArticleStore', () => {
       }
       
       // Act
-      act(() => {
-        useArticleStore.getState().updateArticle('article-1', updatedData)
+      await act(async () => {
+        await useArticleStore.getState().updateArticle('article-1', updatedData)
       })
       
       // Assert
@@ -109,7 +109,7 @@ describe('useArticleStore', () => {
       expect(articles[0].id).toBe('article-1')
     })
 
-    it('should not affect other articles when updating one', () => {
+  it('should not affect other articles when updating one', async () => {
       // Arrange
       const article1: Article = {
         id: 'article-1',
@@ -138,8 +138,8 @@ describe('useArticleStore', () => {
       }
       
       // Act
-      act(() => {
-        useArticleStore.getState().updateArticle('article-1', updatedData)
+      await act(async () => {
+        await useArticleStore.getState().updateArticle('article-1', updatedData)
       })
       
       // Assert
@@ -151,7 +151,7 @@ describe('useArticleStore', () => {
   })
 
   describe('deleteArticle', () => {
-    it('should delete an article by id', () => {
+  it('should delete an article by id', async () => {
       // Arrange
       const article1: Article = {
         id: 'article-1',
@@ -176,8 +176,8 @@ describe('useArticleStore', () => {
       useArticleStore.setState({ articles: [article1, article2] })
       
       // Act
-      act(() => {
-        useArticleStore.getState().deleteArticle('article-1')
+      await act(async () => {
+        await useArticleStore.getState().deleteArticle('article-1')
       })
       
       // Assert
@@ -186,7 +186,7 @@ describe('useArticleStore', () => {
       expect(articles[0].id).toBe('article-2')
     })
 
-    it('should do nothing when deleting non-existent article', () => {
+  it('should do nothing when deleting non-existent article', async () => {
       // Arrange
       const article: Article = {
         id: 'article-1',
@@ -201,8 +201,8 @@ describe('useArticleStore', () => {
       useArticleStore.setState({ articles: [article] })
       
       // Act
-      act(() => {
-        useArticleStore.getState().deleteArticle('non-existent-id')
+      await act(async () => {
+        await useArticleStore.getState().deleteArticle('non-existent-id')
       })
       
       // Assert

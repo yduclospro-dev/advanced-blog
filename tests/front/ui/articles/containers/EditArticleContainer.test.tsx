@@ -1,4 +1,5 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+import { act } from 'react'
 import '@testing-library/jest-dom'
 import EditArticleContainer from '@/components/articles/containers/EditArticleContainer'
 import { Article } from '@/types/Article'
@@ -232,7 +233,9 @@ describe('EditArticleContainer', () => {
       // Act
       fireEvent.change(titleInput, { target: { value: 'Updated Title' } })
       fireEvent.change(contentInput, { target: { value: 'Updated Content' } })
-      fireEvent.click(saveButton)
+      act(() => {
+        fireEvent.click(saveButton)
+      })
 
       // Assert
       expect(mockUpdateArticle).toHaveBeenCalledWith('article1', {
@@ -248,7 +251,9 @@ describe('EditArticleContainer', () => {
       const saveButton = screen.getByTestId('save-button')
 
       // Act
-      fireEvent.click(saveButton)
+      act(() => {
+        fireEvent.click(saveButton)
+      })
 
       // Assert
       await waitFor(() => {
@@ -275,7 +280,9 @@ describe('EditArticleContainer', () => {
 
       // Act
       fireEvent.change(titleInput, { target: { value: 'Only Title Changed' } })
-      fireEvent.click(saveButton)
+      act(() => {
+        fireEvent.click(saveButton)
+      })
 
       // Assert
       expect(mockUpdateArticle).toHaveBeenCalledWith('article1', {
@@ -292,7 +299,9 @@ describe('EditArticleContainer', () => {
 
       // Act
       fireEvent.change(contentInput, { target: { value: 'Only Content Changed' } })
-      fireEvent.click(saveButton)
+      act(() => {
+        fireEvent.click(saveButton)
+      })
 
       // Assert
       expect(mockUpdateArticle).toHaveBeenCalledWith('article1', {
@@ -307,7 +316,9 @@ describe('EditArticleContainer', () => {
       const saveButton = screen.getByTestId('save-button')
 
       // Act
-      fireEvent.click(saveButton)
+      act(() => {
+        fireEvent.click(saveButton)
+      })
 
       // Assert
       expect(mockUpdateArticle).toHaveBeenCalledWith('article1', {
@@ -324,7 +335,9 @@ describe('EditArticleContainer', () => {
       const cancelButton = screen.getByTestId('cancel-button')
 
       // Act
-      fireEvent.click(cancelButton)
+      act(() => {
+        fireEvent.click(cancelButton)
+      })
 
       // Assert
       expect(mockPush).toHaveBeenCalledWith('/articles/article1')
@@ -340,7 +353,9 @@ describe('EditArticleContainer', () => {
       // Act
       fireEvent.change(titleInput, { target: { value: 'Changed' } })
       fireEvent.change(contentInput, { target: { value: 'Changed' } })
-      fireEvent.click(cancelButton)
+      act(() => {
+        fireEvent.click(cancelButton)
+      })
 
       // Assert
       expect(mockUpdateArticle).not.toHaveBeenCalled()

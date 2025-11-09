@@ -50,6 +50,8 @@ export default function NewArticleContainer() {
             title: formData.title,
             content: formData.content,
             imageUrl: formData.imageUrl || undefined,
+            author: currentUser.userName,
+            authorId: currentUser.id,
         };
 
         try {
