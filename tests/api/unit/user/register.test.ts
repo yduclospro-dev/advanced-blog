@@ -1,5 +1,5 @@
 import request from 'supertest';
-import { app } from '../../../../WebApi/server';
+import { app } from '@webapi/server';
 
 function unique(prefix: string) {
   return `${prefix}_${Date.now().toString(36)}_${Math.random().toString(36).slice(2,8)}`;

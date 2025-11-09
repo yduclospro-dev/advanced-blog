@@ -1,9 +1,9 @@
 import type { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
-import { UserService } from "../../Application/services/User/UserService.ts";
-import type { UserDto } from '../../Application/dtos/UserDto.ts';
+import { UserService } from "@app/services/User/UserService";
+import type { UserDto } from '@app/dtos/UserDto';
 import { log } from "console";
-import { UnauthorizedError, NotFoundError } from "../../Domain/errors/index.ts";
+import { UnauthorizedError, NotFoundError } from "@domain/errors/index.ts";
 import { validateRequiredFields } from "../utils/validation.ts";
 
 export class UserController {

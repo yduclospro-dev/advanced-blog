@@ -1,5 +1,5 @@
-import { IRefreshTokenRepository } from "../../Domain/repositories/IRefreshTokenRepository";
-import { RefreshToken } from "../../Domain/entities/RefreshToken";
+import { IRefreshTokenRepository } from "@domain/repositories/IRefreshTokenRepository";
+import { RefreshToken } from "@domain/entities/RefreshToken";
 import { PrismaClient } from "@prisma/client";
 import { hashToken } from "../utils/hashToken";
 

@@ -1,5 +1,5 @@
-import type { IArticleRepository } from '../../Domain/repositories/IArticleRepository.ts';
-import { Article } from '../../Domain/entities/Article.ts';
+import type { IArticleRepository } from '@domain/repositories/IArticleRepository.ts';
+import { Article } from '@domain/entities/Article.ts';
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();

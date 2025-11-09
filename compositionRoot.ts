@@ -1,9 +1,9 @@
-import { UserRepository } from "./Infrastructure/repositories/UserRepository.ts";
-import { ArticleRepository } from "./Infrastructure/repositories/ArticleRepository.ts";
-import { RefreshTokenRepository } from "./Infrastructure/repositories/RefreshTokenRepository.ts";
-import { UserService } from "./Application/services/User/UserService.ts";
-import { ArticleService } from "./Application/services/Article/ArticleService.ts";
-import { ImageUploadService } from "./Application/services/Image/ImageUploadService.ts";
+import { UserRepository } from "@infra/repositories/UserRepository";
+import { ArticleRepository } from "@infra/repositories/ArticleRepository";
+import { RefreshTokenRepository } from "@infra/repositories/RefreshTokenRepository";
+import { UserService } from "@app/services/User/UserService";
+import { ArticleService } from "@app/services/Article/ArticleService";
+import { ImageUploadService } from "@app/services/Image/ImageUploadService";
 
 const userRepository = new UserRepository();
 const articleRepository = new ArticleRepository();

@@ -1,5 +1,5 @@
-import type { IUserRepository } from '../../Domain/repositories/IUserRepository.ts';
-import { User } from '../../Domain/entities/User.ts';
+import type { IUserRepository } from '@domain/repositories/IUserRepository.ts';
+import { User } from '@domain/entities/User.ts';
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
