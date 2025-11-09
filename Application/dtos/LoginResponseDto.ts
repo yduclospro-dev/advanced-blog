@@ -1,4 +1,4 @@
-import { UserDto } from "./UserDto";
+import { UserDto } from "@app/dtos/UserDto";
 
 export interface LoginResponseDto {
   accessToken: string;

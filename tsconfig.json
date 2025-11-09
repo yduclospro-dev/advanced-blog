@@ -12,7 +12,7 @@
     "noEmit": true,
     "esModuleInterop": true,
     "module": "esnext",
-    "moduleResolution": "bundler",
+  "moduleResolution": "node",
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "react-jsx",
@@ -26,13 +26,24 @@
     "paths": {
       "@/*": [
         "./src/*"
-      ]
+      ],
+      "@app/*": ["./Application/*"],
+      "@domain/*": ["./Domain/*"],
+      "@infra/*": ["./Infrastructure/*"],
+      "@webapi/*": ["./WebApi/*"],
+      "@prisma/*": ["./prisma/*"],
+      "@root/*": ["./*"]
     }
   },
   "include": [
     "next-env.d.ts",
     "global.d.ts",
     "src/**/*",
+    "Application/**/*",
+    "Domain/**/*",
+    "Infrastructure/**/*",
+    "WebApi/**/*",
+    "prisma/**/*",
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts",
     "**/*.mts",

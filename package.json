@@ -4,14 +4,11 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "serve": "tsx WebApi/server.ts",
+  "serve": "tsx -r tsconfig-paths/register WebApi/server.ts",
     "build": "next build --turbopack",
     "start": "next start",
-    "test": "npm run test:front && npm run test:back",
-    "test:front": "jest --config=tests/jest.front.cjs",
-    "test:front:watch": "jest --config=tests/jest.front.cjs --watchAll",
-    "test:back": "npm run test:ci:db:start && npm run db:test:reset && jest --config=tests/jest.back.cjs --runInBand && npm run test:ci:db:stop",
-    "test:back:watch": "npm run test:ci:db:start && cross-env DOTENV_CONFIG_PATH=.env.test jest --config=tests/jest.back.cjs --watchAll",
+    "test": "npm run test:ci:db:start && npm run db:test:reset && cross-env DOTENV_CONFIG_PATH=.env.test jest --config=tests/jest.back.cjs --runInBand && npm run test:ci:db:stop",
+    "test:watch": "npm run test:ci:db:start && cross-env DOTENV_CONFIG_PATH=.env.test jest --config=tests/jest.back.cjs --watchAll",
     "db:test:reset": "cross-env DOTENV_CONFIG_PATH=.env.test npx prisma migrate reset --force --skip-seed --schema=prisma/schema.prisma",
     "test:ci:db:start": "docker compose -f docker-compose.test.yml up -d",
     "test:ci:db:stop": "docker compose -f docker-compose.test.yml down -v",
@@ -59,6 +56,7 @@
     "tailwindcss": "^4",
     "ts-jest": "^29.4.5",
     "tsx": "^4.20.6",
+    "tsconfig-paths": "^4.2.0",
     "typescript": "^5"
   }
 }

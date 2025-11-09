@@ -1,6 +1,6 @@
 import type { Request, Response, NextFunction } from "express";
-import { ArticleService } from "../../Application/services/Article/ArticleService.ts";
-import { UnauthorizedError } from "../../Domain/errors/index.ts";
+import { ArticleService } from "@app/services/Article/ArticleService.ts";
+import { UnauthorizedError } from "@domain/errors/index.ts";
 import { validateRequiredFields } from "../utils/validation.ts";
 
 export class ArticleController {

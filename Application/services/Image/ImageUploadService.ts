@@ -1,4 +1,4 @@
-import cloudinary from '../../../Infrastructure/config/cloudinary';
+import cloudinary from '@infra/config/cloudinary';
 import type { UploadApiResponse } from 'cloudinary';
 
 export class ImageUploadService {

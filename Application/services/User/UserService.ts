@@ -1,11 +1,11 @@
-import type { IUserRepository } from "../../../Domain/repositories/IUserRepository.ts";
-import type { IRefreshTokenRepository } from "../../../Domain/repositories/IRefreshTokenRepository.ts";
-import { User } from "../../../Domain/entities/User.ts";
-import { RefreshToken } from "../../../Domain/entities/RefreshToken.ts";
+import type { IUserRepository } from "@domain/repositories/IUserRepository.ts";
+import type { IRefreshTokenRepository } from "@domain/repositories/IRefreshTokenRepository.ts";
+import { User } from "@domain/entities/User.ts";
+import { RefreshToken } from "@domain/entities/RefreshToken.ts";
 import type { UserDto } from "../../dtos/UserDto.ts";
-import type { LoginResponseDto } from "../../dtos/LoginResponseDto.ts";
+import type { LoginResponseDto } from "@app/dtos/LoginResponseDto.ts";
 import bcrypt from "bcryptjs";
-import { ConflictError, BadRequestError, UnauthorizedError } from "../../../Domain/errors/index.ts";
+import { ConflictError, BadRequestError, UnauthorizedError } from "@domain/errors/index.ts";
 
 export class UserService {
   private userRepository: IUserRepository;
