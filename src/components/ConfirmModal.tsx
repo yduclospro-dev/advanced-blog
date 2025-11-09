@@ -14,8 +14,10 @@ export default function ConfirmModal({ message, onConfirm, onCancel }: ConfirmMo
 
     useEffect(() => {
         document.body.classList.add("overflow-hidden");
-        setVisible(true);
+        // avoid synchronous setState inside effect
+        const t = setTimeout(() => setVisible(true), 0);
         return () => {
+            clearTimeout(t);
             document.body.classList.remove("overflow-hidden");
         };
     }, []);

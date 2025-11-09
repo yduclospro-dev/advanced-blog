@@ -17,9 +17,13 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    const isDark = document.documentElement.classList.contains('dark');
-    setTheme(isDark ? 'dark' : 'light');
-    setMounted(true);
+    // defer state updates to avoid synchronous setState inside effect
+    const t = setTimeout(() => {
+      const isDark = document.documentElement.classList.contains('dark');
+      setTheme(isDark ? 'dark' : 'light');
+      setMounted(true);
+    }, 0);
+    return () => clearTimeout(t);
   }, []);
 
   const toggleTheme = () => {

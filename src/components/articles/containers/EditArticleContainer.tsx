@@ -47,7 +47,7 @@ export default function EditArticleContainer() {
         setToast({ message: "Article modifié avec succès !", type: "success" });
         
         setTimeout(() => {
-          router.push('/articles');
+          router.push(`/articles/${article.id}`);
         }, 1500);
       } catch (error) {
         setToast({ 
