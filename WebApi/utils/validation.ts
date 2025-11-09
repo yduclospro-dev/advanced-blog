@@ -1,4 +1,4 @@
-import { BadRequestError } from '@domain/errors/index.ts';
+import { BadRequestError } from '@domain/errors';
 
 export function validateRequiredFields(
   body: Record<string, unknown>,

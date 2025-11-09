@@ -1,5 +1,5 @@
 import type { Request, Response, NextFunction } from 'express';
-import { HttpError } from '@domain/errors/index.ts';
+import { HttpError } from '@domain/errors';
 
 export function errorHandler(
   error: Error,

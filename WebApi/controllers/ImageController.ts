@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import multer from 'multer';
 import { ImageUploadService } from '@app/services/Image/ImageUploadService';
-import { BadRequestError } from '@domain/errors/index.ts';
+import { BadRequestError } from '@domain/errors';
 
 const storage = multer.memoryStorage();
 
