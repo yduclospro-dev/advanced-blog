@@ -105,16 +105,9 @@ const userStoreCreator: StateCreator<UserState, [], [], UserState> = (set, get) 
       if (loginResponse.status !== 200) {
         return { success: false, error: loginResponse.data?.message };
       }
+      console.log("loginResponse:", loginResponse);
 
-      const token = loginResponse.data.token;
-      const refreshToken = loginResponse.data.refreshToken;
-      if (refreshToken) {
-        try {
-          localStorage.setItem('refresh-token', refreshToken);
-        } catch {
-          // ignore storage errors
-        }
-      }
+      const token = loginResponse.data.accessToken;
       
       set({ token });
 
@@ -138,19 +131,11 @@ const userStoreCreator: StateCreator<UserState, [], [], UserState> = (set, get) 
   },
 
   logout: async () => {
-    // try to revoke refresh token on the server if we have one
+    // ask server to revoke current refresh token (server reads cookie)
     try {
-      const refreshToken = localStorage.getItem('refresh-token');
-      if (refreshToken) {
-        try {
-          await axiosInstance.post('/logout', { refreshToken });
-        } catch {
-          // if the server call fails, we still want to clear client state
-          // optionally log for debugging
-        }
-      }
+      await axiosInstance.post('/logout');
     } catch {
-      // ignore localStorage errors and proceed to clear client state
+      // ignore server errors on logout
     }
 
     set({ 
@@ -160,7 +145,7 @@ const userStoreCreator: StateCreator<UserState, [], [], UserState> = (set, get) 
 
     try {
       localStorage.removeItem('token-storage');
-      localStorage.removeItem('refresh-token');
+      // refresh token is stored in httpOnly cookie and cleared by server
     } catch {
       // ignore
     }

@@ -18,6 +18,7 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "cookie-parser": "^1.4.6",
     "@prisma/client": "^6.18.0",
     "@testing-library/user-event": "^14.6.1",
     "@types/cors": "^2.8.19",
@@ -42,6 +43,7 @@
     "@types/jest": "^30.0.0",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/multer": "^2.0.0",
+    "@types/cookie-parser": "^1.4.3",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",

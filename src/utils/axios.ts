@@ -6,6 +6,7 @@ const axiosInstance = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
+  withCredentials: true,
 });
 
 axiosInstance.interceptors.request.use(
@@ -32,7 +33,8 @@ axiosInstance.interceptors.response.use(
     const status = error.response?.status;
     
     if (status === 401 && !url.includes('/login')) {
-      useUserStore.getState().logout();
+      // trigger logout and wait for it to complete
+      return useUserStore.getState().logout().then(() => Promise.reject(error));
     }
     
     return Promise.reject(error);
