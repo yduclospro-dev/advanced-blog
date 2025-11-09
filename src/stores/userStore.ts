@@ -20,7 +20,7 @@ interface UserState {
   fetchCurrentUser: () => Promise<{ success: boolean; error?: string; user?: AuthUser }>;
   register: (userName: string, email: string, password: string) => Promise<{ success: boolean; error?: string }>;
   login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
-  logout: () => void;
+  logout: () => Promise<void>;
 }
 
 const userStoreCreator: StateCreator<UserState, [], [], UserState> = (set, get) => ({
@@ -107,6 +107,14 @@ const userStoreCreator: StateCreator<UserState, [], [], UserState> = (set, get) 
       }
 
       const token = loginResponse.data.token;
+      const refreshToken = loginResponse.data.refreshToken;
+      if (refreshToken) {
+        try {
+          localStorage.setItem('refresh-token', refreshToken);
+        } catch {
+          // ignore storage errors
+        }
+      }
       
       set({ token });
 
@@ -129,13 +137,33 @@ const userStoreCreator: StateCreator<UserState, [], [], UserState> = (set, get) 
     }
   },
 
-  logout: () => {
+  logout: async () => {
+    // try to revoke refresh token on the server if we have one
+    try {
+      const refreshToken = localStorage.getItem('refresh-token');
+      if (refreshToken) {
+        try {
+          await axiosInstance.post('/logout', { refreshToken });
+        } catch {
+          // if the server call fails, we still want to clear client state
+          // optionally log for debugging
+        }
+      }
+    } catch {
+      // ignore localStorage errors and proceed to clear client state
+    }
+
     set({ 
       currentUser: null, 
       token: null
     });
-    
-    localStorage.removeItem('token-storage');
+
+    try {
+      localStorage.removeItem('token-storage');
+      localStorage.removeItem('refresh-token');
+    } catch {
+      // ignore
+    }
   },
 });
 
