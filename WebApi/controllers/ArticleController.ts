@@ -1,6 +1,7 @@
 import type { Request, Response, NextFunction } from "express";
 import { ArticleService } from "../../Application/services/Article/ArticleService.ts";
-import { BadRequestError, UnauthorizedError } from "../../Domain/errors/index.ts";
+import { UnauthorizedError } from "../../Domain/errors/index.ts";
+import { validateRequiredFields } from "../utils/validation.ts";
 
 export class ArticleController {
   private articleService: ArticleService;
@@ -30,16 +31,15 @@ export class ArticleController {
 
   async create(req: Request, res: Response, next: NextFunction) {
     try {
-      const { title, content, imageUrl } = req.body;
       const authorId = req.user?.id;
 
       if (!authorId) {
         throw new UnauthorizedError("Utilisateur non authentifié");
       }
 
-      if (!title || !content) {
-        throw new BadRequestError("Champs requis manquants: title et content sont obligatoires");
-      }
+      validateRequiredFields(req.body, ['title', 'content']);
+
+      const { title, content, imageUrl } = req.body;
 
       const createdArticle = await this.articleService.create(
         title,
