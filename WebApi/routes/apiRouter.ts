@@ -17,6 +17,8 @@ apiRouter.get('/status', (req, res) => {
 
 apiRouter.post('/register', userController.register.bind(userController));
 apiRouter.post('/login', userController.login.bind(userController));
+apiRouter.post('/refresh', userController.refresh.bind(userController));
+apiRouter.post('/logout', userController.logout.bind(userController));
 apiRouter.get('/me', authenticate,  userController.me.bind(userController));
 
 apiRouter.post('/upload/image', authenticate, upload.single('image'), imageController.uploadImage.bind(imageController));

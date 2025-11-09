@@ -1,14 +1,19 @@
 import type { IUserRepository } from "../../../Domain/repositories/IUserRepository.ts";
+import type { IRefreshTokenRepository } from "../../../Domain/repositories/IRefreshTokenRepository.ts";
 import { User } from "../../../Domain/entities/User.ts";
+import { RefreshToken } from "../../../Domain/entities/RefreshToken.ts";
 import type { UserDto } from "../../dtos/UserDto.ts";
+import type { LoginResponseDto } from "../../dtos/LoginResponseDto.ts";
 import bcrypt from "bcryptjs";
 import { ConflictError, BadRequestError, UnauthorizedError } from "../../../Domain/errors/index.ts";
 
 export class UserService {
   private userRepository: IUserRepository;
+  private refreshTokenRepository: IRefreshTokenRepository;
 
-  constructor(userRepository: IUserRepository) {
+  constructor(userRepository: IUserRepository, refreshTokenRepository: IRefreshTokenRepository) {
     this.userRepository = userRepository;
+    this.refreshTokenRepository = refreshTokenRepository;
   }
 
   async register(userName: string, email: string, password: string): Promise<UserDto> {
@@ -86,5 +91,45 @@ export class UserService {
       email: user.email,
       role: user.role
     };
+  }
+
+  async generateRefreshToken(userId: string): Promise<RefreshToken> {
+    const token = crypto.randomUUID();
+    const refreshToken = RefreshToken.create(userId, token, 7);
+    await this.refreshTokenRepository.create(refreshToken);
+    return refreshToken;
+  }
+
+  async refresh(refreshTokenString: string): Promise<LoginResponseDto> {
+    const refreshToken = await this.refreshTokenRepository.findByToken(refreshTokenString);
+    
+    if (!refreshToken) {
+      throw new UnauthorizedError("Refresh token invalide ou expiré");
+    }
+
+    const user = await this.userRepository.findById(refreshToken.userId);
+    if (!user || !user.id) {
+      throw new UnauthorizedError("Utilisateur non trouvé");
+    }
+
+    await this.refreshTokenRepository.deleteByToken(refreshTokenString);
+
+    const newRefreshToken = await this.generateRefreshToken(user.id);
+
+    return {
+      accessToken: "",
+      refreshToken: newRefreshToken.token,
+      expiresIn: 900,
+      user: {
+        id: user.id,
+        userName: user.userName,
+        email: user.email,
+        role: user.role
+      }
+    };
+  }
+
+  async logout(refreshTokenString: string): Promise<void> {
+    await this.refreshTokenRepository.deleteByToken(refreshTokenString);
   }
 }

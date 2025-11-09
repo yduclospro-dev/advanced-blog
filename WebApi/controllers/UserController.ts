@@ -38,13 +38,21 @@ export class UserController {
       const { email, password } = req.body;
 
       const user = await this.userService.verifyCredentials(email, password);
-      const token = this.generateToken(user);
+      const accessToken = this.generateToken(user);
+      const refreshToken = await this.userService.generateRefreshToken(user.id);
 
       log("User logged in:", user);
 
       res.status(200).json({
-        message: "Connexion réussie",
-        token
+        accessToken,
+        refreshToken: refreshToken.token,
+        expiresIn: 900,
+        user: {
+          id: user.id,
+          userName: user.userName,
+          email: user.email,
+          role: user.role
+        }
       });
     } catch (error) {
       next(error);
@@ -74,6 +82,40 @@ export class UserController {
     }
   }
 
+  async refresh(req: Request, res: Response, next: NextFunction) {
+    try {
+      validateRequiredFields(req.body, ['refreshToken']);
+
+      const { refreshToken } = req.body;
+
+      const loginResponse = await this.userService.refresh(refreshToken);
+      const accessToken = this.generateToken(loginResponse.user);
+
+      res.status(200).json({
+        accessToken,
+        refreshToken: loginResponse.refreshToken,
+        expiresIn: 900,
+        user: loginResponse.user
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async logout(req: Request, res: Response, next: NextFunction) {
+    try {
+      validateRequiredFields(req.body, ['refreshToken']);
+
+      const { refreshToken } = req.body;
+
+      await this.userService.logout(refreshToken);
+
+      res.status(204).send();
+    } catch (error) {
+      next(error);
+    }
+  }
+
   private generateToken = (user: UserDto): string => {
     return jwt.sign(
       { 
@@ -82,7 +124,7 @@ export class UserController {
         role: user.role
       },
       process.env.JWT_SECRET,
-      { expiresIn: '24h' }
+      { expiresIn: '15m' }
     );
   }
 }

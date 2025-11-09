@@ -1,5 +1,7 @@
+
 import express from "express";
 import next from "next";
+import cors from "cors";
 import apiRouter from "./routes/apiRouter.ts";
 import { errorHandler } from "./middleware/errorHandler.ts";
 
@@ -11,6 +13,12 @@ const port = Number(process.env.PORT || 3000);
 nextApp.prepare().then(() => {
   const app = express();
   app.use(express.json());
+
+  // Autorise les requêtes du front (localhost:3000)
+  app.use(cors({
+    origin: "http://localhost:3000",
+    credentials: true
+  }));
 
   app.use("/api", apiRouter);
 
