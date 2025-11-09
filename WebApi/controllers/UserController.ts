@@ -3,7 +3,8 @@ import jwt from "jsonwebtoken";
 import { UserService } from "../../Application/services/User/UserService.ts";
 import type { UserDto } from '../../Application/dtos/UserDto.ts';
 import { log } from "console";
-import { BadRequestError, UnauthorizedError, NotFoundError } from "../../Domain/errors/index.ts";
+import { UnauthorizedError, NotFoundError } from "../../Domain/errors/index.ts";
+import { validateRequiredFields } from "../utils/validation.ts";
 
 export class UserController {
   private userService: UserService;
@@ -14,10 +15,9 @@ export class UserController {
 
   async register(req: Request, res: Response, next: NextFunction) {
     try {
+      validateRequiredFields(req.body, ['userName', 'email', 'password']);
+
       const { userName, email, password } = req.body;
-      if (!userName || !email || !password) {
-        throw new BadRequestError("Champs requis manquants");
-      }
 
       const user = await this.userService.register(userName, email, password);
       res.status(201).json({
@@ -33,11 +33,9 @@ export class UserController {
 
   async login(req: Request, res: Response, next: NextFunction) {
     try {
-      const { email, password } = req.body;
+      validateRequiredFields(req.body, ['email', 'password']);
 
-      if (!email || !password) {
-        throw new BadRequestError("Email et mot de passe requis");
-      }
+      const { email, password } = req.body;
 
       const user = await this.userService.verifyCredentials(email, password);
       const token = this.generateToken(user);
