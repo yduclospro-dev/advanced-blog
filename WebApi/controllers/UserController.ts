@@ -3,8 +3,8 @@ import jwt from "jsonwebtoken";
 import { UserService } from "@app/services/User/UserService";
 import type { UserDto } from '@app/dtos/UserDto';
 import { log } from "console";
-import { UnauthorizedError, NotFoundError } from "@domain/errors/index.ts";
-import { validateRequiredFields } from "../utils/validation.ts";
+import { UnauthorizedError, NotFoundError } from "@domain/errors";
+import { validateRequiredFields } from "../utils/validation";
 
 export class UserController {
   private userService: UserService;

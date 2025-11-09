@@ -1,10 +1,10 @@
-import { Article } from "@domain/entities/Article.ts";
-import type { IArticleRepository } from "@domain/repositories/IArticleRepository.ts";
+import { Article } from "@domain/entities/Article";
+import type { IArticleRepository } from "@domain/repositories/IArticleRepository";
 import { DisplayArticleDto } from "../../dtos/Article/DisplayArticleDto.ts";
 import { CreateArticleDto } from "../../dtos/Article/CreateArticleDto.ts";
 import { UserRole } from "@prisma/client";
 import { isOwnerOrAdmin } from "@domain/utils/permissions.ts";
-import { BadRequestError, NotFoundError, ForbiddenError } from "@domain/errors/index.ts";
+import { BadRequestError, NotFoundError, ForbiddenError } from "@domain/errors";
 
 export class ArticleService {
   private _articleRepository: IArticleRepository;

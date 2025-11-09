@@ -7,12 +7,11 @@ module.exports = {
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json'],
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
-    '^@app/(.*)$': '<rootDir>/Application/$1',
-    '^@domain/(.*)$': '<rootDir>/Domain/$1',
-    '^@infra/(.*)$': '<rootDir>/Infrastructure/$1',
-    '^@webapi/(.*)$': '<rootDir>/WebApi/$1',
-    '^@prisma/(.*)$': '<rootDir>/prisma/$1',
-    '^@root/(.*)$': '<rootDir>/$1',
+  '^@app/(.*)$': '<rootDir>/Application/$1',
+  '^@domain/(.*)$': '<rootDir>/Domain/$1',
+  '^@infra/(.*)$': '<rootDir>/Infrastructure/$1',
+  '^@webapi/(.*)$': '<rootDir>/WebApi/$1',
+  '^@root/(.*)$': '<rootDir>/$1',
     '\\.(css|less|scss|sass)$': 'identity-obj-proxy',
     '\\.(gif|ttf|eot|svg|png)$': '<rootDir>/tests/__mocks__/fileMock.js'
   },
