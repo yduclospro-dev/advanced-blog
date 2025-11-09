@@ -22,14 +22,21 @@ export default function Navbar() {
   }, []);
 
   const handleLogout = () => {
-    logout()
-    setToast({ message: "Déconnexion réussie !", type: "success" });
-    setIsMenuOpen(false)
-    
-    setTimeout(() => {
-      router.push('/')
-      router.refresh()
-    }, 1500);
+    // call async logout and wait for server-side revocation
+    (async () => {
+      try {
+        await logout()
+        setToast({ message: "Déconnexion réussie !", type: "success" });
+      } catch {
+        setToast({ message: "Erreur lors de la déconnexion", type: "error" });
+      }
+      setIsMenuOpen(false)
+
+      setTimeout(() => {
+        router.push('/')
+        router.refresh()
+      }, 1500);
+    })();
   }
 
   useEffect(() => {
