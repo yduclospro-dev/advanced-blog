@@ -1,10 +1,10 @@
 export interface Comment {
     id: string;
     articleId: string;
-    authorId: string;
-    authorName: string;
+    userId: string;
     content: string;
-    date: string;
-    likes: string[];
-    dislikes: string[];
+    createdAt: string;
+    updatedAt: string;
+    // Optionnel : authorName si tu veux l'afficher, sinon à retirer
+    authorName?: string;
 }

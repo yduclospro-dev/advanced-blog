@@ -14,71 +14,55 @@ import { useUiStore } from "@/stores/uiStore";
 export default function ArticleDetailContainer() {
     const { id } = useParams();
     const router = useRouter();
-    const { getArticleById, toggleArticleLike, toggleArticleDislike, fetchArticles } = useArticleStore();
+    const { getArticleById, fetchArticles } = useArticleStore();
     const isLoading = useUiStore((state) => state.isLoading('articles'));
     const currentUser = useUserStore((state) => state.currentUser);
-    const { 
-        getCommentsByArticle, 
-        addComment, 
-        updateComment, 
+    const {
+        comments,
+        fetchComments,
+        addComment,
+        updateComment,
         deleteComment,
-        toggleCommentLike,
-        toggleCommentDislike
+        error: commentsError
     } = useCommentsStore();
     
     const [toast, setToast] = useState<{ message: string; type: ToastType } | null>(null);
+
     const article = getArticleById(String(id));
-    const comments = article ? getCommentsByArticle(article.id) : [];
+
 
     useEffect(() => {
         fetchArticles();
     }, [fetchArticles]);
 
+    useEffect(() => {
+        if (article) {
+            fetchComments(article.id);
+        }
+    }, [article, fetchComments]);
+
     const handleBack = () => {
         router.push("/articles");
     };
 
-    const handleAddComment = (content: string) => {
-        if (!article || !currentUser) return;
-        
-        addComment({
-            articleId: article.id,
-            authorId: currentUser.id,
-            authorName: currentUser.userName,
-            content,
-        });
+
+    const handleAddComment = async (content: string) => {
+        if (!article) return;
+        await addComment(article.id, content);
         setToast({ message: "Commentaire ajouté avec succès !", type: "success" });
     };
 
-    const handleUpdateComment = (commentId: string, content: string) => {
-        updateComment(commentId, content);
+    const handleUpdateComment = async (commentId: string, content: string) => {
+        await updateComment(commentId, content);
         setToast({ message: "Commentaire modifié avec succès !", type: "success" });
     };
 
-    const handleDeleteComment = (commentId: string) => {
-        deleteComment(commentId);
+    const handleDeleteComment = async (commentId: string) => {
+        await deleteComment(commentId);
         setToast({ message: "Commentaire supprimé avec succès !", type: "success" });
     };
 
-    const handleArticleLike = () => {
-        if (!article || !currentUser) return;
-        toggleArticleLike(article.id, currentUser.id);
-    };
 
-    const handleArticleDislike = () => {
-        if (!article || !currentUser) return;
-        toggleArticleDislike(article.id, currentUser.id);
-    };
-
-    const handleCommentLike = (commentId: string) => {
-        if (!currentUser) return;
-        toggleCommentLike(commentId, currentUser.id);
-    };
-
-    const handleCommentDislike = (commentId: string) => {
-        if (!currentUser) return;
-        toggleCommentDislike(commentId, currentUser.id);
-    };
 
     if (isLoading || !article) {
         return (
@@ -120,12 +104,6 @@ export default function ArticleDetailContainer() {
                         onAdd: handleAddComment,
                         onUpdate: handleUpdateComment,
                         onDelete: handleDeleteComment,
-                        onLike: handleCommentLike,
-                        onDislike: handleCommentDislike,
-                    }}
-                    articleLikeHandlers={{
-                        onLike: handleArticleLike,
-                        onDislike: handleArticleDislike,
                     }}
                 />
             </ClientOnly>

@@ -1,7 +1,7 @@
 import { Article } from "@domain/entities/Article";
 import type { IArticleRepository } from "@domain/repositories/IArticleRepository";
-import { DisplayArticleDto } from "../../dtos/Article/DisplayArticleDto.ts";
-import { CreateArticleDto } from "../../dtos/Article/CreateArticleDto.ts";
+import { DisplayArticleDto } from "../../dtos/Article/DisplayArticleDto";
+import { CreateArticleDto } from "../../dtos/Article/CreateArticleDto";
 import { UserRole } from "@prisma/client";
 import { isOwnerOrAdmin } from "@domain/utils/permissions.ts";
 import { BadRequestError, NotFoundError, ForbiddenError } from "@domain/errors";
@@ -48,17 +48,17 @@ export class ArticleService {
   }
 
   async findById(id: string): Promise<DisplayArticleDto | null> {
-    const article = await this._articleRepository.findById(id);
-    if (!article) throw new NotFoundError("Article non trouvé");
+    const found = await this._articleRepository.findById(id);    
+    if (!found) throw new NotFoundError("Article non trouvé");
 
     return {
-      id: article.id as string,
-      title: article.title,
-      author: article.author,
-      authorId: article.authorId,
-      content: article.content,
-      date: article.date,
-      imageUrl: article.imageUrl
+      id: found.id!,
+      title: found.title,
+      author: found.author,
+      authorId: found.authorId,
+      content: found.content,
+      date: found.date,
+      imageUrl: found.imageUrl || undefined
     };
   }
 
