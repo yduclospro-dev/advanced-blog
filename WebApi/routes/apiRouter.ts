@@ -33,6 +33,7 @@ apiRouter.get('/me', authenticate,  userController.me.bind(userController));
 apiRouter.post('/upload/image', authenticate, upload.single('image'), imageController.uploadImage.bind(imageController));
 apiRouter.delete('/upload/image', authenticate, imageController.deleteImage.bind(imageController));
 
+apiRouter.get('/articles/search', articleController.searchArticles.bind(articleController));
 apiRouter.get('/articles', articleController.getAll.bind(articleController));
 apiRouter.get('/articles/:id', articleController.getById.bind(articleController));
 apiRouter.post('/articles', authenticate, articleController.create.bind(articleController));

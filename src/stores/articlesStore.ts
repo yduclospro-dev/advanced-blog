@@ -1,3 +1,27 @@
+    /**
+     * Recherche paginée côté backend
+     */
+    fetchArticlesSearch: async (search: string, page = get().page, limit = get().limit) => {
+        useUiStore.getState().setLoading('articles', true);
+        set({ error: null });
+        try {
+            const response = await axios.get(`/articles/search?search=${encodeURIComponent(search)}&page=${page}&limit=${limit}`);
+            const { articles, total } = response.data;
+            const articlesWithLikes = articles.map((article: Article) => ({
+                ...article,
+                likes: JSON.parse(localStorage.getItem(`article-${article.id}-likes`) || "[]"),
+                dislikes: JSON.parse(localStorage.getItem(`article-${article.id}-dislikes`) || "[]"),
+            }));
+            set({ articles: articlesWithLikes, total, page, limit });
+            useUiStore.getState().setLoading('articles', false);
+        } catch (error: unknown) {
+            const errorMessage = isAxiosError(error)
+                ? error.response?.data?.message || error.message
+                : "Erreur lors de la recherche d'articles";
+            set({ error: errorMessage });
+            useUiStore.getState().setLoading('articles', false);
+        }
+    },
 "use client";
 
 import { create } from "zustand";
@@ -8,6 +32,7 @@ import { useUiStore } from "./uiStore";
 
 const API_URL = "/articles";
 
+
 interface ArticleStore {
     articles: Article[];
     total: number;
@@ -15,6 +40,7 @@ interface ArticleStore {
     limit: number;
     error: string | null;
     fetchArticles: (page?: number, limit?: number) => Promise<void>;
+    fetchArticlesSearch: (search: string, page?: number, limit?: number) => Promise<void>;
     setPage: (page: number) => void;
     getArticleById: (id: string) => Article | undefined;
     getLatestArticles: (limit: number) => Article[];
@@ -24,6 +50,7 @@ interface ArticleStore {
     toggleArticleLike: (articleId: string, userId: string) => void;
     toggleArticleDislike: (articleId: string, userId: string) => void;
 }
+
 
 export const useArticleStore = create<ArticleStore>()((set, get) => ({
     articles: [],
@@ -49,6 +76,31 @@ export const useArticleStore = create<ArticleStore>()((set, get) => ({
             const errorMessage = isAxiosError(error) 
                 ? error.response?.data?.message || error.message 
                 : "Erreur lors de la récupération des articles";
+            set({ error: errorMessage });
+            useUiStore.getState().setLoading('articles', false);
+        }
+    },
+
+    /**
+     * Recherche paginée côté backend
+     */
+    fetchArticlesSearch: async (search: string, page = get().page, limit = get().limit) => {
+        useUiStore.getState().setLoading('articles', true);
+        set({ error: null });
+        try {
+            const response = await axios.get(`/articles/search?search=${encodeURIComponent(search)}&page=${page}&limit=${limit}`);
+            const { articles, total } = response.data;
+            const articlesWithLikes = articles.map((article: Article) => ({
+                ...article,
+                likes: JSON.parse(localStorage.getItem(`article-${article.id}-likes`) || "[]"),
+                dislikes: JSON.parse(localStorage.getItem(`article-${article.id}-dislikes`) || "[]"),
+            }));
+            set({ articles: articlesWithLikes, total, page, limit });
+            useUiStore.getState().setLoading('articles', false);
+        } catch (error: unknown) {
+            const errorMessage = isAxiosError(error)
+                ? error.response?.data?.message || error.message
+                : "Erreur lors de la recherche d'articles";
             set({ error: errorMessage });
             useUiStore.getState().setLoading('articles', false);
         }
