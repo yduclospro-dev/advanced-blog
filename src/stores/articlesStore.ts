@@ -10,8 +10,12 @@ const API_URL = "/articles";
 
 interface ArticleStore {
     articles: Article[];
+    total: number;
+    page: number;
+    limit: number;
     error: string | null;
-    fetchArticles: () => Promise<void>;
+    fetchArticles: (page?: number, limit?: number) => Promise<void>;
+    setPage: (page: number) => void;
     getArticleById: (id: string) => Article | undefined;
     getLatestArticles: (limit: number) => Article[];
     addArticle: (articleData: { title: string; content: string; imageUrl?: string; author?: string; authorId?: string; }) => Promise<void>;
@@ -23,22 +27,23 @@ interface ArticleStore {
 
 export const useArticleStore = create<ArticleStore>()((set, get) => ({
     articles: [],
+    total: 0,
+    page: 1,
+    limit: 25,
     error: null,
 
-    fetchArticles: async () => {
+    fetchArticles: async (page = get().page, limit = get().limit) => {
         useUiStore.getState().setLoading('articles', true);
         set({ error: null });
         try {
-            const response = await axios.get(API_URL);
-            const articles = response.data;
-            
+            const response = await axios.get(`${API_URL}?page=${page}&limit=${limit}`);
+            const { articles, total } = response.data;
             const articlesWithLikes = articles.map((article: Article) => ({
                 ...article,
                 likes: JSON.parse(localStorage.getItem(`article-${article.id}-likes`) || "[]"),
                 dislikes: JSON.parse(localStorage.getItem(`article-${article.id}-dislikes`) || "[]"),
             }));
-            
-            set({ articles: articlesWithLikes });
+            set({ articles: articlesWithLikes, total, page, limit });
             useUiStore.getState().setLoading('articles', false);
         } catch (error: unknown) {
             const errorMessage = isAxiosError(error) 
@@ -47,6 +52,11 @@ export const useArticleStore = create<ArticleStore>()((set, get) => ({
             set({ error: errorMessage });
             useUiStore.getState().setLoading('articles', false);
         }
+    },
+
+    setPage: (page: number) => {
+        set({ page });
+        get().fetchArticles(page, get().limit);
     },
 
     getArticleById: (id) => get().articles.find((a) => a.id === id),

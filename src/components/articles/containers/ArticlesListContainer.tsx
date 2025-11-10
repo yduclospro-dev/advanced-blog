@@ -11,15 +11,21 @@ import { useUiStore } from "@/stores/uiStore";
 
 export default function ArticlesListContainer() {
     const router = useRouter();
-    const { articles, fetchArticles, deleteArticle } = useArticleStore();
+    const { articles, fetchArticles, deleteArticle, page, limit, total, setPage } = useArticleStore();
+    // Ajoute la gestion du changement de limit
+    const setLimit = (newLimit: number) => {
+        // On repart à la page 1 si on change la taille
+        fetchArticles(1, newLimit);
+    };
     const isLoading = useUiStore((state) => state.isLoading('articles'));
     const currentUser = useUserStore((state) => state.currentUser);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [articleToDelete, setArticleToDelete] = useState<string | null>(null);
 
     useEffect(() => {
-        fetchArticles();
-    }, [fetchArticles]);
+        fetchArticles(page, limit);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [page, limit]);
 
     const handleEditArticle = (id: string) => {
         router.push(`/articles/${id}/edit`);
@@ -62,6 +68,11 @@ export default function ArticlesListContainer() {
                         currentUserRole={currentUser?.role}
                         onEditArticle={handleEditArticle}
                         onDeleteArticle={handleDeleteArticle}
+                        page={page}
+                        limit={limit}
+                        total={total}
+                        onPageChange={setPage}
+                        onLimitChange={setLimit}
                     />
                     {showDeleteModal && (
                         <ConfirmModal
