@@ -53,6 +53,35 @@ export class ArticleRepository implements IArticleRepository {
     );
   }
 
+  async findAllPaginated(params: { page: number; limit: number }): Promise<{ articles: Article[]; total: number }> {
+    const { page, limit } = params;
+    const skip = (page - 1) * limit;
+    const [articles, total] = await Promise.all([
+      prisma.article.findMany({
+        orderBy: { date: 'desc' },
+        include: { user: true },
+        skip,
+        take: limit,
+      }),
+      prisma.article.count(),
+    ]);
+    return {
+      articles: articles.map(
+        (a) =>
+          new Article(
+            a.title,
+            a.user.userName,
+            a.authorId,
+            a.date.toISOString().split('T')[0],
+            a.content,
+            a.imageUrl || undefined,
+            a.id
+          )
+      ),
+      total,
+    };
+  }
+
   async findById(id: string): Promise<Article | null> {
     const found = await prisma.article.findUnique({
       where: { id },

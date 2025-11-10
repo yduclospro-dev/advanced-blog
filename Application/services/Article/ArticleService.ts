@@ -64,7 +64,6 @@ export class ArticleService {
 
   async findAll(): Promise<DisplayArticleDto[]> {
     const articles = await this._articleRepository.findAll();
-
     return articles.map(article => ({
       id: article.id as string,
       title: article.title,
@@ -74,6 +73,24 @@ export class ArticleService {
       imageUrl: article.imageUrl,
       date: article.date
     }));
+  }
+
+  async findAllPaginated(page: number, limit: number): Promise<{ articles: DisplayArticleDto[]; total: number; page: number; limit: number }> {
+    const { articles, total } = await this._articleRepository.findAllPaginated({ page, limit });
+    return {
+      articles: articles.map(article => ({
+        id: article.id as string,
+        title: article.title,
+        author: article.author,
+        authorId: article.authorId,
+        content: article.content,
+        imageUrl: article.imageUrl,
+        date: article.date
+      })),
+      total,
+      page,
+      limit,
+    };
   }
 
   async update(
