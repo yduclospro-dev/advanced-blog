@@ -1,6 +1,6 @@
 import type { IArticleRepository } from '@domain/repositories/IArticleRepository.ts';
 import { Article } from '@domain/entities/Article.ts';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, Prisma } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
@@ -129,5 +129,44 @@ export class ArticleRepository implements IArticleRepository {
   async delete(id: string): Promise<void> {
     await prisma.article.delete({ where: { id } });
   }
-}
 
+  async searchPaginated(params: { page: number; limit: number; search: string }): Promise<{ articles: Article[]; total: number }> {
+    const { page, limit, search } = params;
+    const skip = (page - 1) * limit;
+    const searchQuery = search.trim();
+    const where = searchQuery
+      ? {
+          OR: [
+            { title: { contains: searchQuery, mode: Prisma.QueryMode.insensitive } },
+            { content: { contains: searchQuery, mode: Prisma.QueryMode.insensitive } },
+            { user: { userName: { contains: searchQuery, mode: Prisma.QueryMode.insensitive } } },
+          ],
+        }
+      : {};
+    const [articles, total] = await Promise.all([
+      prisma.article.findMany({
+        where,
+        orderBy: { date: 'desc' },
+        include: { user: true },
+        skip,
+        take: limit,
+      }),
+      prisma.article.count({ where }),
+    ]);
+    return {
+      articles: articles.map(
+        (a) =>
+          new Article(
+            a.title,
+            a.user.userName,
+            a.authorId,
+            a.date.toISOString().split('T')[0],
+            a.content,
+            a.imageUrl || undefined,
+            a.id
+          )
+      ),
+      total,
+    };
+  }
+}

@@ -1,16 +1,34 @@
-import { Article } from "@domain/entities/Article";
 import type { IArticleRepository } from "@domain/repositories/IArticleRepository";
 import { DisplayArticleDto } from "../../dtos/Article/DisplayArticleDto";
 import { CreateArticleDto } from "../../dtos/Article/CreateArticleDto";
 import { UserRole } from "@prisma/client";
 import { isOwnerOrAdmin } from "@domain/utils/permissions.ts";
 import { BadRequestError, NotFoundError, ForbiddenError } from "@domain/errors";
+import { Article } from "@domain/entities/Article";
 
 export class ArticleService {
   private _articleRepository: IArticleRepository;
 
   constructor(articleRepository: IArticleRepository) {
     this._articleRepository = articleRepository;
+  }
+
+  async searchPaginated(page: number, limit: number, search: string): Promise<{ articles: DisplayArticleDto[]; total: number; page: number; limit: number }> {
+    const { articles, total } = await this._articleRepository.searchPaginated({ page, limit, search });
+    return {
+      articles: articles.map(article => ({
+        id: article.id as string,
+        title: article.title,
+        author: article.author,
+        authorId: article.authorId,
+        content: article.content,
+        imageUrl: article.imageUrl,
+        date: article.date
+      })),
+      total,
+      page,
+      limit,
+    };
   }
 
   async create(

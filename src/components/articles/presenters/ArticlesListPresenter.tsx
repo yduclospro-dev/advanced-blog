@@ -5,6 +5,7 @@ import ArticleCard from "@/components/ArticleCard";
 import { ButtonLink } from "@/components/ui";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 
+
 interface ArticlesListPresenterProps {
     articles: Article[];
     isAuthenticated: boolean;
@@ -17,6 +18,8 @@ interface ArticlesListPresenterProps {
     total: number;
     onPageChange: (page: number) => void;
     onLimitChange: (limit: number) => void;
+    searchTerm: string;
+    setSearchTerm: (value: string) => void;
 }
 
 
@@ -32,10 +35,21 @@ export default function ArticlesListPresenter({
     total,
     onPageChange,
     onLimitChange,
+    searchTerm,
+    setSearchTerm,
 }: ArticlesListPresenterProps) {
     const totalPages = Math.ceil(total / limit);
     return (
         <div className="bg-gray-50 dark:bg-slate-900 min-h-screen py-16 px-10 md:px-20 lg:px-32 transition-colors">
+            <div className="max-w-6xl mx-auto mb-6 flex flex-col sm:flex-row items-center gap-4">
+                <input
+                    type="text"
+                    className="w-full sm:w-96 px-4 py-2 rounded-lg border border-gray-300 dark:bg-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-400 shadow-sm text-base"
+                    placeholder="Rechercher dans tous les articles..."
+                    value={searchTerm}
+                    onChange={e => setSearchTerm(e.target.value)}
+                />
+            </div>
             <div className="max-w-6xl mx-auto mb-10 lg:hidden">
                 <h1 className="text-4xl font-extrabold text-gray-900 dark:text-white mb-4">Articles</h1>
                 {isAuthenticated && (
