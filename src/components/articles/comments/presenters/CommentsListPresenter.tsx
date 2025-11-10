@@ -1,8 +1,9 @@
-import { Comment } from "@/types/Comment";
-import { Button, TextArea, LikeDislikeButtons } from "@/components/ui";
+import type { Comment } from "@/types/Comment";
+import { Button, TextArea } from "@/components/ui";
 import ConfirmModal from "@/components/ConfirmModal";
 
-interface CommentsListPresenterProps {
+
+type CommentsListPresenterProps = {
     comments: Comment[];
     currentUserId?: string;
     editingId: string | null;
@@ -15,9 +16,7 @@ interface CommentsListPresenterProps {
     onShowDeleteConfirm: (commentId: string) => void;
     onConfirmDelete: () => void;
     onCancelDelete: () => void;
-    onCommentLike: (commentId: string) => void;
-    onCommentDislike: (commentId: string) => void;
-}
+};
 
 export default function CommentsListPresenter({
     comments,
@@ -32,8 +31,6 @@ export default function CommentsListPresenter({
     onShowDeleteConfirm,
     onConfirmDelete,
     onCancelDelete,
-    onCommentLike,
-    onCommentDislike,
 }: CommentsListPresenterProps) {
     if (comments.length === 0) {
         return (
@@ -49,7 +46,7 @@ export default function CommentsListPresenter({
                 💬 Commentaires ({comments.length})
             </h3>
             {comments.map((comment) => {
-                const isAuthor = currentUserId === comment.authorId;
+                const isAuthor = currentUserId === comment.userId;
                 const isEditing = editingId === comment.id;
 
                 return (
@@ -67,13 +64,18 @@ export default function CommentsListPresenter({
                                     {comment.authorName}
                                 </p>
                                 <p className="text-sm text-gray-500 dark:text-slate-400">
-                                    {new Date(comment.date).toLocaleDateString("fr-FR", {
-                                        day: "numeric",
-                                        month: "long",
-                                        year: "numeric",
-                                        hour: "2-digit",
-                                        minute: "2-digit",
-                                    })}
+                                    {(() => {
+                                        const d = new Date(comment.createdAt);
+                                        return isNaN(d.getTime())
+                                            ? 'Date inconnue'
+                                            : d.toLocaleDateString("fr-FR", {
+                                                day: "numeric",
+                                                month: "long",
+                                                year: "numeric",
+                                                hour: "2-digit",
+                                                minute: "2-digit",
+                                            });
+                                    })()}
                                 </p>
                             </div>
                             {isAuthor && !isEditing && (
@@ -132,18 +134,7 @@ export default function CommentsListPresenter({
                                 <p className="text-gray-700 dark:text-slate-300 leading-relaxed mb-3">
                                     {comment.content}
                                 </p>
-                                {currentUserId && !isAuthor && (
-                                    <div className="flex justify-end">
-                                        <LikeDislikeButtons
-                                            likesCount={comment.likes.length}
-                                            dislikesCount={comment.dislikes.length}
-                                            hasLiked={comment.likes.includes(currentUserId)}
-                                            hasDisliked={comment.dislikes.includes(currentUserId)}
-                                            onLike={() => onCommentLike(comment.id)}
-                                            onDislike={() => onCommentDislike(comment.id)}
-                                        />
-                                    </div>
-                                )}
+
                             </>
                         )}
                     </div>
@@ -159,5 +150,5 @@ export default function CommentsListPresenter({
                 />
             )}
         </div>
-    );
+    )
 }

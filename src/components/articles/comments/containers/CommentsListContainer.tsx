@@ -11,8 +11,6 @@ interface CommentsListContainerProps {
     currentUserId?: string;
     onDelete: (commentId: string) => void;
     onUpdate: (commentId: string, content: string) => void;
-    onLike: (commentId: string) => void;
-    onDislike: (commentId: string) => void;
 }
 
 export default function CommentsListContainer({
@@ -20,8 +18,6 @@ export default function CommentsListContainer({
     currentUserId,
     onDelete,
     onUpdate,
-    onLike,
-    onDislike,
 }: CommentsListContainerProps) {
     const [editingId, setEditingId] = useState<string | null>(null);
     const [editContent, setEditContent] = useState("");
@@ -95,8 +91,6 @@ export default function CommentsListContainer({
                 onShowDeleteConfirm={handleShowDeleteConfirm}
                 onConfirmDelete={handleConfirmDelete}
                 onCancelDelete={handleCancelDelete}
-                onCommentLike={onLike}
-                onCommentDislike={onDislike}
             />
         </>
     );

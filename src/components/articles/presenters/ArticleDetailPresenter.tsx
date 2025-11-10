@@ -1,6 +1,6 @@
 import { Article } from "@/types/Article";
 import { Comment } from "@/types/Comment";
-import { Button, Card, LikeDislikeButtons } from "@/components/ui";
+import { Button, Card } from "@/components/ui";
 import CommentsListContainer from "../comments/containers/CommentsListContainer";
 import CommentFormContainer from "../comments/containers/CommentFormContainer";
 import Image from "next/image";
@@ -9,14 +9,9 @@ interface CommentHandlers {
     onAdd: (content: string) => void;
     onUpdate: (commentId: string, content: string) => void;
     onDelete: (commentId: string) => void;
-    onLike: (commentId: string) => void;
-    onDislike: (commentId: string) => void;
 }
 
-interface ArticleLikeHandlers {
-    onLike: () => void;
-    onDislike: () => void;
-}
+
 
 interface ArticleDetailPresenterProps {
     article: Article;
@@ -25,7 +20,6 @@ interface ArticleDetailPresenterProps {
     onBack: () => void;
     comments: Comment[];
     commentHandlers: CommentHandlers;
-    articleLikeHandlers: ArticleLikeHandlers;
 }
 
 export default function ArticleDetailPresenter({
@@ -35,7 +29,6 @@ export default function ArticleDetailPresenter({
     onBack,
     comments,
     commentHandlers,
-    articleLikeHandlers,
 }: ArticleDetailPresenterProps) {
     return (
         <div className="bg-linear-to-b from-gray-50 to-white dark:from-slate-900 dark:to-slate-800 min-h-screen py-16 px-6 md:px-20 lg:px-32 transition-colors">
@@ -85,18 +78,7 @@ export default function ArticleDetailPresenter({
                         ))}
                     </div>
 
-                    {isAuthenticated && (
-                        <div className="mt-8 flex justify-center">
-                            <LikeDislikeButtons
-                                likesCount={article.likes?.length ?? 0}
-                                dislikesCount={article.dislikes?.length ?? 0}
-                                hasLiked={currentUserId ? article.likes?.includes(currentUserId) ?? false : false}
-                                hasDisliked={currentUserId ? article.dislikes?.includes(currentUserId) ?? false : false}
-                                onLike={articleLikeHandlers.onLike}
-                                onDislike={articleLikeHandlers.onDislike}
-                            />
-                        </div>
-                    )}
+
                 </article>
 
                 <div className="mt-12 pt-8 border-t-2 border-gray-200 dark:border-slate-700">
@@ -117,8 +99,6 @@ export default function ArticleDetailPresenter({
                         currentUserId={currentUserId}
                         onDelete={commentHandlers.onDelete}
                         onUpdate={commentHandlers.onUpdate}
-                        onLike={commentHandlers.onLike}
-                        onDislike={commentHandlers.onDislike}
                     />
                 </div>
             </Card>
