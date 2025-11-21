@@ -3,7 +3,7 @@ name: Pipeline Blog
 on:
   pull_request:
     branches:
-      - main
+      - master
 
 jobs:
   build-and-test:
