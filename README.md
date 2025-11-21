@@ -72,6 +72,9 @@ L’API permet de gérer :
 - les articles
 - les commentaires sous chaque article
 
+Documentation complète :
+https://documenter.getpostman.com/view/50257644/2sB3dHUsNp
+
 ## Tests
 
 Les tests utilisent Jest et une base PostgreSQL lancée via Docker.
