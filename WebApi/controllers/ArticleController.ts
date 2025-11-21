@@ -1,9 +1,10 @@
 
 import type { Request, Response, NextFunction } from "express";
+import { sendApiResponse } from '@webapi/utils/response';
 import { ArticleService } from "@app/services/Article/ArticleService.ts";
 import { UnauthorizedError } from "@domain/errors/index.ts";
-import { validateRequiredFields } from "../utils/validation.ts";
-
+import { validateRequiredFields } from "@webapi/utils/validation.ts";
+import { BadRequestError } from "@domain/errors/index.ts";
 
 export class ArticleController {
   private articleService: ArticleService;
@@ -14,37 +15,25 @@ export class ArticleController {
 
   async searchArticles(req: Request, res: Response, next: NextFunction) {
     try {
-      let page = parseInt(req.query.page as string);
-      let limit = parseInt(req.query.limit as string);
+      const pageRaw = req.query.page as string;
+      const limitRaw = req.query.limit as string;
       const search = (req.query.search as string) || "";
-      if (isNaN(page) || page < 1) page = 1;
-      if (isNaN(limit) || limit < 1 || limit > 100) limit = 10;
-      if (page < 1 || limit < 1 || limit > 100) {
-        const { BadRequestError } = await import("@domain/errors/BadRequestError.ts");
-        throw new BadRequestError("Paramètres de pagination invalides (page >= 1, 1 <= limit <= 100)");
-      }
-      const result = await this.articleService.searchPaginated(page, limit, search);
-      res.status(200).json(result);
-    } catch (error) {
-      next(error);
-    }
-  }
+      const page = parseInt(pageRaw);
+      const limit = parseInt(limitRaw);
 
-  async getAll(req: Request, res: Response, next: NextFunction) {
-    try {
-      // Pagination : ?page=1&limit=10
-      let page = parseInt(req.query.page as string);
-      let limit = parseInt(req.query.limit as string);
-      if (isNaN(page) || page < 1) page = 1;
-      if (isNaN(limit) || limit < 1 || limit > 100) limit = 10;
-      // Contrôle strict : refuse les valeurs absurdes
-      if (page < 1 || limit < 1 || limit > 100) {
-        // 100 = limite max raisonnable côté API
-        const { BadRequestError } = await import("@domain/errors/BadRequestError.ts");
-        throw new BadRequestError("Paramètres de pagination invalides (page >= 1, 1 <= limit <= 100)");
+      if ((pageRaw !== undefined && isNaN(page)) || (limitRaw !== undefined && isNaN(limit))) {
+        throw new BadRequestError("Paramètres de pagination non numériques");
       }
-      const result = await this.articleService.findAllPaginated(page, limit);
-      res.status(200).json(result);
+
+      if (page < 1 || limit < 1) {
+        throw new BadRequestError("Paramètres de pagination invalides (page >= 1, limit >= 1)");
+      }
+
+      const result = await this.articleService.searchPaginated(page, limit, search);
+      sendApiResponse(res, {
+        success: true,
+        result: result
+      });
     } catch (error) {
       next(error);
     }
@@ -54,7 +43,11 @@ export class ArticleController {
     try {
       const { id } = req.params;
       const article = await this.articleService.findById(id);
-      res.status(200).json(article);
+
+      sendApiResponse(res, {
+        success: true,
+        result: article
+      });
     } catch (error) {
       next(error);
     }
@@ -63,7 +56,6 @@ export class ArticleController {
   async create(req: Request, res: Response, next: NextFunction) {
     try {
       const authorId = req.user?.id;
-
       if (!authorId) {
         throw new UnauthorizedError("Utilisateur non authentifié");
       }
@@ -79,7 +71,12 @@ export class ArticleController {
         imageUrl
       );
 
-      res.status(201).json(createdArticle);
+      sendApiResponse(res, {
+        success: true,
+        statusCode: 201,
+        message: 'Article créé',
+        result: createdArticle
+      });
     } catch (error) {
       next(error);
     }
@@ -101,7 +98,12 @@ export class ArticleController {
         content,
         imageUrl,
       });
-      res.status(200).json(updatedArticle);
+
+      sendApiResponse(res, {
+        success: true,
+        message: 'Article mis à jour',
+        result: updatedArticle
+      });
     } catch (error) {
       next(error);
     }
@@ -118,7 +120,12 @@ export class ArticleController {
       }
 
       await this.articleService.delete(id, userId, userRole);
-      res.status(204).send();
+      sendApiResponse(res, {
+        success: true,
+        statusCode: 200,
+        message: 'Article supprimé',
+        result: null
+      });
     } catch (error) {
       next(error);
     }

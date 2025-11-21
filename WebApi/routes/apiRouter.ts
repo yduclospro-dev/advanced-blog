@@ -1,11 +1,11 @@
 import { Router } from "express";
-import { UserController } from "../controllers/UserController.ts";
-import { ArticleController } from "../controllers/ArticleController.ts";
-import { ImageController, upload } from "../controllers/ImageController.ts";
-import { userService, articleService, imageUploadService, commentService } from "../../compositionRoot.ts";
 
-import { CommentController } from "../controllers/CommentController";
-import { authenticate } from "../middleware/authenticate.ts";
+import { UserController } from "@webapi/controllers/UserController.ts";
+import { ArticleController } from "@webapi/controllers/ArticleController.ts";
+import { ImageController, upload } from "@webapi/controllers/ImageController.ts";
+import { userService, articleService, imageUploadService, commentService } from "@root/compositionRoot.ts";
+import { CommentController } from "@webapi/controllers/CommentController";
+import { authenticate } from "@webapi/middleware/authenticate.ts";
 
 const apiRouter = Router();
 
@@ -34,7 +34,6 @@ apiRouter.post('/upload/image', authenticate, upload.single('image'), imageContr
 apiRouter.delete('/upload/image', authenticate, imageController.deleteImage.bind(imageController));
 
 apiRouter.get('/articles/search', articleController.searchArticles.bind(articleController));
-apiRouter.get('/articles', articleController.getAll.bind(articleController));
 apiRouter.get('/articles/:id', articleController.getById.bind(articleController));
 apiRouter.post('/articles', authenticate, articleController.create.bind(articleController));
 apiRouter.put('/articles/:id', authenticate, articleController.update.bind(articleController));

@@ -1,5 +1,5 @@
 import request from 'supertest';
-import { app } from '../../../../WebApi/server';
+import { app } from '@webapi/server';
 
 describe('Commentaires API', () => {
   describe('POST /api/articles/:articleId/comments', () => {
