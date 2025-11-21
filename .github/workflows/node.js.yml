@@ -52,4 +52,5 @@ jobs:
       - name: Lancer les tests
         env:
           DATABASE_URL: "postgresql://test:test@localhost:5434/advanced_blog_test?schema=public"
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
         run: npm run test
