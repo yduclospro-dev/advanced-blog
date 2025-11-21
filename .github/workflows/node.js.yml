@@ -16,8 +16,6 @@ jobs:
           POSTGRES_USER: test
           POSTGRES_PASSWORD: test
           POSTGRES_DB: advanced_blog_test
-        ports:
-          - 5433:5432
         options: >-
           --health-cmd="pg_isready -U test"
           --health-interval=5s
