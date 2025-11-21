@@ -19,7 +19,7 @@ describe('POST /api/login', () => {
       .post('/api/login')
       .send({ email, password: 'password123' });
     expect(res.status).toBe(200);
-    expect(res.body).toHaveProperty('accessToken');
+    expect(res.body.result).toHaveProperty('accessToken');
   });
 
   it('should fail with wrong password', async () => {

@@ -1,5 +1,5 @@
 import request from 'supertest';
-import { app } from '@webapi/server';
+import { app } from '../../../../WebApi/server';
 
 function unique(prefix: string) {
   return `${prefix}_${Date.now().toString(36)}_${Math.random().toString(36).slice(2,8)}`;
@@ -17,7 +17,7 @@ describe('GET /api/me', () => {
     const res = await request(app)
       .post('/api/login')
       .send({ email, password: 'password123' });
-    accessToken = res.body.accessToken;
+    accessToken = res.body.result.accessToken;
   });
 
   it('should return user info with valid token', async () => {
@@ -25,7 +25,7 @@ describe('GET /api/me', () => {
       .get('/api/me')
       .set('Authorization', `Bearer ${accessToken}`);
     expect(res.status).toBe(200);
-    expect(res.body).toHaveProperty('email');
+    expect(res.body.result).toHaveProperty('email');
   });
 
   it('should fail without token', async () => {

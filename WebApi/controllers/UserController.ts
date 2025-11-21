@@ -59,7 +59,7 @@ export class UserController {
 
       const refreshSecret = process.env.JWT_SECRET;
       if (!refreshSecret) throw new Error('JWT_SECRET non défini');
-      const refreshToken = jwt.sign({ userId: user.id }, refreshSecret, { expiresIn: 7 * 24 * 60 * 60 });
+      const refreshToken = jwt.sign({ userId: user.id, email: user.email, role: user.role }, refreshSecret, { expiresIn: 7 * 24 * 60 * 60 });
 
       res.cookie('refresh_token', refreshToken, {
         httpOnly: true,
@@ -135,7 +135,7 @@ export class UserController {
       }
       const accessToken = this.generateToken(user);
 
-      const newRefreshToken = jwt.sign({ userId: user.id }, secret, { expiresIn: 7 * 24 * 60 * 60 });
+      const newRefreshToken = jwt.sign({ userId: user.id, email: user.email, role: user.role }, secret, { expiresIn: 7 * 24 * 60 * 60 });
       res.cookie('refresh_token', newRefreshToken, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',

@@ -12,7 +12,7 @@ describe('POST /api/register', () => {
       .post('/api/register')
       .send({ userName: name, email: `${name}@example.com`, password: 'password123' });
     expect(res.status).toBe(201);
-    expect(res.body).toHaveProperty('id');
+    expect(res.body.result).toHaveProperty('id');
   });
 
   it('should fail if email already exists', async () => {
