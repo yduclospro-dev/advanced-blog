@@ -21,7 +21,7 @@ app.use(errorHandler);
 
 if (!process.env.JEST_WORKER_ID) {
   app.listen(port, () => {
-    console.log(`Server ready on http://localhost:${port}`);
+    console.log(`Server ready on http://localhost:${port}/api`);
   });
 } else {
   app.use((req, res, next) => {
