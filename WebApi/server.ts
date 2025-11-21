@@ -49,7 +49,7 @@ app.use(errorHandler);
 if (!process.env.JEST_WORKER_ID) {
   app.listen(port, () => {
     if (process.env.NODE_ENV === "production") {
-      console.log(`Server ready and listening (production mode) on port ${port}`);
+      console.log("Application has started");
     } else {
       console.log(`Server ready on http://localhost:${port}`);
     }
