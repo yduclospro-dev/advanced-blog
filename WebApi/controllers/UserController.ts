@@ -41,7 +41,6 @@ export class UserController {
 
   async login(req: Request, res: Response, next: NextFunction) {
     try {
-      // Empêche la connexion si déjà connecté (refresh_token présent)
       if (req.cookies && req.cookies.refresh_token) {
         return sendApiResponse(res, {
           success: false,
@@ -165,6 +164,19 @@ export class UserController {
         statusCode: 200,
         message: 'Déconnexion réussie',
         result: null
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async getAllUsers(req: Request, res: Response, next: NextFunction) {
+    try {
+      const users = await this.userService.getAllUsers();
+      return sendApiResponse(res, {
+        success: true,
+        message: 'Liste des utilisateurs',
+        result: users
       });
     } catch (error) {
       next(error);

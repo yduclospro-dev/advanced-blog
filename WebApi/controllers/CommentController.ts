@@ -45,7 +45,6 @@ export class CommentController {
   async getCommentsByArticle(req: Request, res: Response, next: NextFunction) {
     try {
       const articleId = req.params.articleId;
-      // Vérifie que l'article existe avant de chercher les commentaires
       var article = await articleService.findById(articleId);
       if (!article) {
         throw new NotFoundError('Article non trouvé');
