@@ -4,9 +4,9 @@ export class EmailService {
   private resend: Resend;
   private from: string;
 
-  constructor(apiKey: string, from: string) {
-    this.resend = new Resend(apiKey);
-    this.from = from;
+  constructor() {
+    this.resend = new Resend(process.env.RESEND_API_KEY);
+    this.from = process.env.RESEND_FROM || 'noreply@mieru-app.space';
   }
 
   async sendResetPasswordEmail(to: string, resetLink: string): Promise<void> {

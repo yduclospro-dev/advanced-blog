@@ -1,12 +1,13 @@
-import { passwordResetController } from "@root/compositionRoot";
+import { PrismaClient } from "@prisma/client";
 import { Router } from "express";
 import { UserController } from "@webapi/controllers/UserController.ts";
 import { ArticleController } from "@webapi/controllers/ArticleController.ts";
 import { ImageController, upload } from "@webapi/controllers/ImageController.ts";
-import { userService, articleService, imageUploadService, commentService } from "@root/compositionRoot.ts";
+import { userService, articleService, imageUploadService, commentService, passwordResetService, emailService } from "@root/compositionRoot.ts";
 import { CommentController } from "@webapi/controllers/CommentController";
 import { authenticate } from "@webapi/middleware/authenticate.ts";
 import { ensureNotAuthenticated } from "@webapi/middleware/ensureNotAuthenticated.ts";
+import { PasswordResetController } from "@webapi/controllers/PasswordResetController";
 
 const apiRouter = Router();
 
@@ -14,9 +15,23 @@ const commentController = new CommentController(commentService);
 const userController = new UserController(userService);
 const articleController = new ArticleController(articleService);
 const imageController = new ImageController(imageUploadService);
+const passwordResetController = new PasswordResetController(passwordResetService, emailService);
 
-apiRouter.get('/status', (req, res) => {
-  res.json({ status: 'ok' })
+const prisma = new PrismaClient();
+apiRouter.get('/', async (req, res) => {
+  res.send('API is running');
+});
+
+apiRouter.get('/healthz', async (req, res) => {
+  const start = Date.now();
+  try {
+    await prisma.user.count();
+    const duration = Date.now() - start;
+    res.status(200).json({ status: 'ok', db: 'ok', durationMs: duration });
+  } catch (e) {
+    const duration = Date.now() - start;
+    res.status(503).json({ status: 'error', db: 'unreachable', durationMs: duration });
+  }
 });
 
 apiRouter.post('/register', userController.register.bind(userController));
