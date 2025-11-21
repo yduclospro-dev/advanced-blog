@@ -1,5 +1,6 @@
 import { PrismaClient, UserRole } from '@prisma/client';
 import bcrypt from 'bcryptjs';
+import { log } from 'node:console';
 
 const prisma = new PrismaClient();
 
@@ -51,6 +52,11 @@ async function main() {
     });
     users.push(user);
   }
+
+  log('✅ 3 utilisateurs de test créés:');
+  users.forEach((user) => {
+    log(`- ${user.userName} (${user.email})`);
+  });
 
   // Génération de 200 articles de base
   const allUsers = [admin, ...users];

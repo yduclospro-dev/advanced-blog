@@ -1,3 +1,4 @@
+  import jwt from 'jsonwebtoken';   
 import type { IUserRepository } from "@domain/repositories/IUserRepository";
 import { User } from "@domain/entities/User";
 import type { UserDto } from "@app/dtos/User/UserDto";
@@ -88,5 +89,19 @@ export class UserService {
     };
   }
 
-
+  async getAllUsers(): Promise<UserDto[]> {
+    const users = await this.userRepository.getAll();
+    return users.map(user => ({
+      id: user.id as string,
+      userName: user.userName,
+      email: user.email,
+      role: user.role
+    }));
+  }
+  
+  async updatePassword(userId: string, newPassword: string): Promise<void> {
+    if (newPassword.length < 6) throw new BadRequestError("Le mot de passe doit contenir au moins 6 caractères");
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    await this.userRepository.updatePassword(userId, hashedPassword);
+  }
 }

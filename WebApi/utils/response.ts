@@ -17,6 +17,7 @@ export function sendApiResponse<T>(
   return res.status(statusCode).json({
     success,
     message,
-    result
+    result,
+    statusCode
   });
 }
