@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
+import { sendApiResponse } from '@webapi/utils/response';
 import multer from 'multer';
 import { ImageUploadService } from '@app/services/Image/ImageUploadService';
 import { BadRequestError } from '@domain/errors';
@@ -36,7 +37,11 @@ export class ImageController {
 
       const imageUrl = await this.imageUploadService.uploadImage(req.file.buffer);
 
-      res.status(200).json({ imageUrl });
+      sendApiResponse(res, {
+        success: true,
+        message: 'Image uploadée',
+        result: { imageUrl }
+      });
     } catch (error) {
       next(error);
     }
@@ -52,7 +57,11 @@ export class ImageController {
 
       await this.imageUploadService.deleteImage(imageUrl);
 
-      res.status(200).json({ message: 'Image supprimée avec succès' });
+      sendApiResponse(res, {
+        success: true,
+        message: 'Image supprimée avec succès',
+        result: null
+      });
     } catch (error) {
       next(error);
     }

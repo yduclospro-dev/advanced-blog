@@ -1,4 +1,4 @@
-import { HttpError } from './HttpError.ts';
+import { HttpError } from '@domain/errors/HttpError.ts';
 
 export class NotFoundError extends HttpError {
   constructor(message: string = 'Ressource non trouvée') {

@@ -1,0 +1,224 @@
+{
+  "info": {
+    "_postman_id": "advanced-blog-api-collection-full",
+    "name": "Advanced Blog API (Full)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Auth - Register (success)",
+      "request": {
+        "method": "POST",
+        "header": [ { "key": "Content-Type", "value": "application/json" } ],
+        "body": { "mode": "raw", "raw": "{\n  \"userName\": \"testuser\",\n  \"email\": \"test@example.com\",\n  \"password\": \"password123\"\n}" },
+        "url": { "raw": "http://localhost:3000/api/register", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "register"] }
+      },
+      "event": [{ "listen": "test", "script": { "exec": [
+        "pm.test(\"Status code is 201\", function () { pm.response.to.have.status(201); });",
+        "pm.test(\"Inscription réussie\", function () { pm.expect(pm.response.json().message).to.eql('Inscription réussie'); });"
+      ], "type": "text/javascript" } }]
+    },
+    {
+      "name": "Auth - Register (missing fields)",
+      "request": {
+        "method": "POST",
+        "header": [ { "key": "Content-Type", "value": "application/json" } ],
+        "body": { "mode": "raw", "raw": "{\n  \"userName\": \"\",\n  \"email\": \"\",\n  \"password\": \"\"\n}" },
+        "url": { "raw": "http://localhost:3000/api/register", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "register"] }
+      },
+      "event": [{ "listen": "test", "script": { "exec": [
+        "pm.test(\"Status code is 400\", function () { pm.response.to.have.status(400); });"
+      ], "type": "text/javascript" } }]
+    },
+    {
+      "name": "Auth - Login (success)",
+      "request": {
+        "method": "POST",
+        "header": [ { "key": "Content-Type", "value": "application/json" } ],
+        "body": { "mode": "raw", "raw": "{\n  \"email\": \"test@example.com\",\n  \"password\": \"password123\"\n}" },
+        "url": { "raw": "http://localhost:3000/api/login", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "login"] }
+      },
+      "event": [{ "listen": "test", "script": { "exec": [
+        "pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+        "pm.test(\"Connexion réussie\", function () { pm.expect(pm.response.json().message).to.eql('Connexion réussie'); });",
+        "pm.environment.set('accessToken', pm.response.json().result.accessToken);"
+      ], "type": "text/javascript" } }]
+    },
+    {
+      "name": "Auth - Login (wrong password)",
+      "request": {
+        "method": "POST",
+        "header": [ { "key": "Content-Type", "value": "application/json" } ],
+        "body": { "mode": "raw", "raw": "{\n  \"email\": \"test@example.com\",\n  \"password\": \"wrongpass\"\n}" },
+        "url": { "raw": "http://localhost:3000/api/login", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "login"] }
+      },
+      "event": [{ "listen": "test", "script": { "exec": [
+        "pm.test(\"Status code is 401\", function () { pm.response.to.have.status(401); });"
+      ], "type": "text/javascript" } }]
+    },
+    {
+      "name": "Auth - Me (success)",
+      "request": {
+        "method": "GET",
+        "header": [ { "key": "Authorization", "value": "Bearer {{accessToken}}" } ],
+        "url": { "raw": "http://localhost:3000/api/me", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "me"] }
+      },
+      "event": [{ "listen": "test", "script": { "exec": [
+        "pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+        "pm.test(\"User info present\", function () { var json = pm.response.json(); pm.expect(json.result).to.have.property('id'); });"
+      ], "type": "text/javascript" } }]
+    },
+    {
+      "name": "Auth - Me (unauthenticated)",
+      "request": {
+        "method": "GET",
+        "url": { "raw": "http://localhost:3000/api/me", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "me"] }
+      },
+      "event": [{ "listen": "test", "script": { "exec": [
+        "pm.test(\"Status code is 401\", function () { pm.response.to.have.status(401); });"
+      ], "type": "text/javascript" } }]
+    },
+    {
+      "name": "Auth - Logout (success)",
+      "request": {
+        "method": "POST",
+        "header": [ { "key": "Authorization", "value": "Bearer {{accessToken}}" } ],
+        "url": { "raw": "http://localhost:3000/api/logout", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "logout"] }
+      },
+      "event": [{ "listen": "test", "script": { "exec": [
+        "pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+        "pm.test(\"Déconnexion réussie\", function () { pm.expect(pm.response.json().message).to.include('Déconnexion'); });"
+      ], "type": "text/javascript" } }]
+    },
+    {
+      "name": "Auth - Logout (unauthenticated)",
+      "request": {
+        "method": "POST",
+        "url": { "raw": "http://localhost:3000/api/logout", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "logout"] }
+      },
+      "event": [{ "listen": "test", "script": { "exec": [
+        "pm.test(\"Status code is 401\", function () { pm.response.to.have.status(401); });"
+      ], "type": "text/javascript" } }]
+    },
+    {
+      "name": "Comments - Create (missing content)",
+      "request": {
+        "method": "POST",
+        "header": [ { "key": "Authorization", "value": "Bearer {{accessToken}}" }, { "key": "Content-Type", "value": "application/json" } ],
+        "body": { "mode": "raw", "raw": "{ }" },
+        "url": { "raw": "http://localhost:3000/api/articles/1/comments", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "articles", "1", "comments"] }
+      },
+      "event": [{ "listen": "test", "script": { "exec": [ "pm.test(\"Status code is 400\", function () { pm.response.to.have.status(400); });" ], "type": "text/javascript" } }]
+    },
+    {
+      "name": "Comments - Get by Article (unauthenticated)",
+      "request": {
+        "method": "GET",
+        "url": { "raw": "http://localhost:3000/api/articles/1/comments", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "articles", "1", "comments"] }
+      },
+      "event": [{ "listen": "test", "script": { "exec": [ "pm.test(\"Status code is 401\", function () { pm.response.to.have.status(401); });" ], "type": "text/javascript" } }]
+    },
+    {
+      "name": "Comments - Update (missing content)",
+      "request": {
+        "method": "PUT",
+        "header": [ { "key": "Authorization", "value": "Bearer {{accessToken}}" }, { "key": "Content-Type", "value": "application/json" } ],
+        "body": { "mode": "raw", "raw": "{ }" },
+        "url": { "raw": "http://localhost:3000/api/comments/1", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "comments", "1"] }
+      },
+      "event": [{ "listen": "test", "script": { "exec": [ "pm.test(\"Status code is 400\", function () { pm.response.to.have.status(400); });" ], "type": "text/javascript" } }]
+    },
+    {
+      "name": "Comments - Delete (not found)",
+      "request": {
+        "method": "DELETE",
+        "header": [ { "key": "Authorization", "value": "Bearer {{accessToken}}" } ],
+        "url": { "raw": "http://localhost:3000/api/comments/999999", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "comments", "999999"] }
+      },
+      "event": [{ "listen": "test", "script": { "exec": [ "pm.test(\"Status code is 404\", function () { pm.response.to.have.status(404); });" ], "type": "text/javascript" } }]
+    },
+    {
+      "name": "Comments - Delete (forbidden)",
+      "request": {
+        "method": "DELETE",
+        "header": [ { "key": "Authorization", "value": "Bearer {{accessToken}}" } ],
+        "url": { "raw": "http://localhost:3000/api/comments/otherusercommentid", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "comments", "otherusercommentid"] }
+      },
+      "event": [{ "listen": "test", "script": { "exec": [ "pm.test(\"Status code is 403\", function () { pm.response.to.have.status(403); });" ], "type": "text/javascript" } }]
+    },
+    {
+      "name": "Articles - Create (missing title)",
+      "request": {
+        "method": "POST",
+        "header": [ { "key": "Authorization", "value": "Bearer {{accessToken}}" }, { "key": "Content-Type", "value": "application/json" } ],
+        "body": { "mode": "raw", "raw": "{\n  \"content\": \"Contenu\"\n}" },
+        "url": { "raw": "http://localhost:3000/api/articles", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "articles"] }
+      },
+      "event": [{ "listen": "test", "script": { "exec": [ "pm.test(\"Status code is 400\", function () { pm.response.to.have.status(400); });" ], "type": "text/javascript" } }]
+    },
+    {
+      "name": "Articles - Create (unauthenticated)",
+      "request": {
+        "method": "POST",
+        "header": [ { "key": "Content-Type", "value": "application/json" } ],
+        "body": { "mode": "raw", "raw": "{\n  \"title\": \"Nouvel article\",\n  \"content\": \"Contenu\"\n}" },
+        "url": { "raw": "http://localhost:3000/api/articles", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "articles"] }
+      },
+      "event": [{ "listen": "test", "script": { "exec": [ "pm.test(\"Status code is 401\", function () { pm.response.to.have.status(401); });" ], "type": "text/javascript" } }]
+    },
+    {
+      "name": "Articles - Update (not found)",
+      "request": {
+        "method": "PUT",
+        "header": [ { "key": "Authorization", "value": "Bearer {{accessToken}}" }, { "key": "Content-Type", "value": "application/json" } ],
+        "body": { "mode": "raw", "raw": "{\n  \"title\": \"Article modifié\",\n  \"content\": \"Nouveau contenu\"\n}" },
+        "url": { "raw": "http://localhost:3000/api/articles/999999", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "articles", "999999"] }
+      },
+      "event": [{ "listen": "test", "script": { "exec": [ "pm.test(\"Status code is 404\", function () { pm.response.to.have.status(404); });" ], "type": "text/javascript" } }]
+    },
+    {
+      "name": "Articles - Update (forbidden)",
+      "request": {
+        "method": "PUT",
+        "header": [ { "key": "Authorization", "value": "Bearer {{accessToken}}" }, { "key": "Content-Type", "value": "application/json" } ],
+        "body": { "mode": "raw", "raw": "{\n  \"title\": \"Article modifié\",\n  \"content\": \"Nouveau contenu\"\n}" },
+        "url": { "raw": "http://localhost:3000/api/articles/otheruserarticleid", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "articles", "otheruserarticleid"] }
+      },
+      "event": [{ "listen": "test", "script": { "exec": [ "pm.test(\"Status code is 403\", function () { pm.response.to.have.status(403); });" ], "type": "text/javascript" } }]
+    },
+    {
+      "name": "Articles - Delete (not found)",
+      "request": {
+        "method": "DELETE",
+        "header": [ { "key": "Authorization", "value": "Bearer {{accessToken}}" } ],
+        "url": { "raw": "http://localhost:3000/api/articles/999999", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "articles", "999999"] }
+      },
+      "event": [{ "listen": "test", "script": { "exec": [ "pm.test(\"Status code is 404\", function () { pm.response.to.have.status(404); });" ], "type": "text/javascript" } }]
+    },
+    {
+      "name": "Articles - Delete (forbidden)",
+      "request": {
+        "method": "DELETE",
+        "header": [ { "key": "Authorization", "value": "Bearer {{accessToken}}" } ],
+        "url": { "raw": "http://localhost:3000/api/articles/otheruserarticleid", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "articles", "otheruserarticleid"] }
+      },
+      "event": [{ "listen": "test", "script": { "exec": [ "pm.test(\"Status code is 403\", function () { pm.response.to.have.status(403); });" ], "type": "text/javascript" } }]
+    },
+    {
+      "name": "Articles - Get by ID (not found)",
+      "request": {
+        "method": "GET",
+        "url": { "raw": "http://localhost:3000/api/articles/999999", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "articles", "999999"] }
+      },
+      "event": [{ "listen": "test", "script": { "exec": [ "pm.test(\"Status code is 404\", function () { pm.response.to.have.status(404); });" ], "type": "text/javascript" } }]
+    },
+    {
+      "name": "Articles - Search (invalid params)",
+      "request": {
+        "method": "GET",
+        "url": { "raw": "http://localhost:3000/api/articles/search?page=-1&limit=200", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "articles", "search"], "query": [ { "key": "page", "value": "-1" }, { "key": "limit", "value": "200" } ] }
+      },
+      "event": [{ "listen": "test", "script": { "exec": [ "pm.test(\"Status code is 400\", function () { pm.response.to.have.status(400); });" ], "type": "text/javascript" } }]
+    }
+  ]
+}

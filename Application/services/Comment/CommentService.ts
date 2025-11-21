@@ -1,7 +1,7 @@
 
 
 import type { ICommentRepository } from '@domain/repositories/ICommentRepository';
-import type { CreateCommentDto, UpdateCommentDto, CommentDto } from '@app/dtos/CommentDto';
+import type { CreateCommentDto, UpdateCommentDto, CommentDto } from '@app/dtos/Comment/CommentDto';
 import type { Comment } from '@domain/entities/Comment';
 
 export class CommentService {

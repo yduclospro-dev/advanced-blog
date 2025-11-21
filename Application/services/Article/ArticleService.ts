@@ -1,6 +1,6 @@
 import type { IArticleRepository } from "@domain/repositories/IArticleRepository";
-import { DisplayArticleDto } from "../../dtos/Article/DisplayArticleDto";
-import { CreateArticleDto } from "../../dtos/Article/CreateArticleDto";
+import { DisplayArticleDto } from "@app/dtos/Article/DisplayArticleDto";
+import { CreateArticleDto } from "@app/dtos/Article/CreateArticleDto";
 import { UserRole } from "@prisma/client";
 import { isOwnerOrAdmin } from "@domain/utils/permissions.ts";
 import { BadRequestError, NotFoundError, ForbiddenError } from "@domain/errors";
@@ -93,23 +93,6 @@ export class ArticleService {
     }));
   }
 
-  async findAllPaginated(page: number, limit: number): Promise<{ articles: DisplayArticleDto[]; total: number; page: number; limit: number }> {
-    const { articles, total } = await this._articleRepository.findAllPaginated({ page, limit });
-    return {
-      articles: articles.map(article => ({
-        id: article.id as string,
-        title: article.title,
-        author: article.author,
-        authorId: article.authorId,
-        content: article.content,
-        imageUrl: article.imageUrl,
-        date: article.date
-      })),
-      total,
-      page,
-      limit,
-    };
-  }
 
   async update(
     id: string,

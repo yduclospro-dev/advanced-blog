@@ -1,16 +1,18 @@
 import { NotFoundError } from "@domain/errors/NotFoundError";
+import { sendApiResponse } from '@webapi/utils/response';
 import { ForbiddenError } from "@domain/errors/ForbiddenError";
-import { validateRequiredFields } from "../utils/validation";
+import { validateRequiredFields } from "@webapi/utils/validation";
 import { Request, Response, NextFunction } from 'express';
-import type { CreateCommentDto, UpdateCommentDto } from '@app/dtos/CommentDto';
+import type { CreateCommentDto, UpdateCommentDto } from '@app/dtos/Comment/CommentDto';
 import { CommentService } from "@app/services/Comment/CommentService";
-
-
+import { articleService } from '../../compositionRoot';
 
 export class CommentController {
+  private articleService;
   private commentService;
 
   constructor(commentService: CommentService) {
+    this.articleService = articleService;
     this.commentService = commentService;
   }
 
@@ -18,13 +20,23 @@ export class CommentController {
     try {
       validateRequiredFields(req.body, ["content"]);
       const articleId = req.params.articleId;
+
+      var article = await articleService.findById(articleId);
+      if (!article) {
+        throw new NotFoundError('Article non trouvé');
+      }
       const dto: CreateCommentDto = {
         ...req.body,
         articleId,
         userId: req.user?.id,
       };
       const comment = await this.commentService.createComment(dto);
-      res.status(201).json(comment);
+      sendApiResponse(res, {
+        success: true,
+        statusCode: 201,
+        message: 'Commentaire créé',
+        result: comment
+      });
     } catch (err) {
       next(err);
     }
@@ -33,28 +45,43 @@ export class CommentController {
   async getCommentsByArticle(req: Request, res: Response, next: NextFunction) {
     try {
       const articleId = req.params.articleId;
+      // Vérifie que l'article existe avant de chercher les commentaires
+      var article = await articleService.findById(articleId);
+      if (!article) {
+        throw new NotFoundError('Article non trouvé');
+      }
+
       const comments = await this.commentService.getCommentsByArticle(articleId);
-      res.json(comments);
+      sendApiResponse(res, {
+        success: true,
+        result: comments
+      });
     } catch (err) {
       next(err);
     }
   }
 
-
   async updateComment(req: Request, res: Response, next: NextFunction) {
     try {
-      validateRequiredFields(req.body, ["content"]);
       const id = req.params.id;
-      const dto: UpdateCommentDto = req.body;
       const existing = await this.commentService.getCommentById(id);
+      if (existing?.userId !== req.user?.id) {
+        throw new ForbiddenError('Action interdite');
+      }
+      
       if (!existing) {
         throw new NotFoundError('Commentaire non trouvé');
       }
-      if (existing.userId !== req.user?.id) {
-        throw new ForbiddenError('Action interdite');
-      }
+
+      validateRequiredFields(req.body, ["content"]);
+      
+      const dto: UpdateCommentDto = req.body;
       const comment = await this.commentService.updateComment(id, dto);
-      res.json(comment);
+      sendApiResponse(res, {
+        success: true,
+        message: 'Commentaire modifié',
+        result: comment
+      });
     } catch (err) {
       next(err);
     }
@@ -64,14 +91,21 @@ export class CommentController {
     try {
       const id = req.params.id;
       const existing = await this.commentService.getCommentById(id);
+      if (existing?.userId !== req.user?.id) {
+        throw new ForbiddenError('Action interdite');
+      }
+      
       if (!existing) {
         throw new NotFoundError('Commentaire non trouvé');
       }
-      if (existing.userId !== req.user?.id) {
-        throw new ForbiddenError('Action interdite');
-      }
+      
       await this.commentService.deleteComment(id);
-      res.status(204).send();
+      sendApiResponse(res, {
+        success: true,
+        statusCode: 200,
+        message: 'Commentaire supprimé',
+        result: null
+      });
     } catch (err) {
       next(err);
     }

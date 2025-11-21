@@ -1,6 +1,8 @@
 import jwt from 'jsonwebtoken';
 import type { Response, NextFunction, Request } from 'express';
 import { UserRole } from '@prisma/client';
+import { sendApiResponse } from '@webapi/utils/response';
+import { log } from 'node:console';
 
 const JWT_SECRET = process.env.JWT_SECRET;
 
@@ -9,13 +11,17 @@ if (!JWT_SECRET) {
 }
 
 export function authenticate(req: Request, res: Response, next: NextFunction) {
-    const authHeader = req.headers.authorization;
+    log("cookies:", req.cookies);
+    const token = req.cookies && req.cookies.refresh_token;
 
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-        return res.status(401).json({ error: 'Token manquant ou invalide' });
+    if (!token) {
+        return sendApiResponse(res, {
+            success: false,
+            message: 'Token manquant ou invalide',
+            result: null,
+            statusCode: 401
+        });
     }
-
-    const token = authHeader.substring(7);
 
     try {
         const decoded = jwt.verify(token, JWT_SECRET) as {
@@ -32,6 +38,11 @@ export function authenticate(req: Request, res: Response, next: NextFunction) {
 
         next();
     } catch {
-        return res.status(401).json({ error: 'Token invalide ou expiré' });
+        return sendApiResponse(res, {
+            success: false,
+            message: 'Token invalide ou expiré',
+            result: null,
+            statusCode: 401
+        });
     }
 }
