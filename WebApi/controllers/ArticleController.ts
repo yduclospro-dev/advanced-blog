@@ -17,9 +17,11 @@ export class ArticleController {
     try {
       const pageRaw = req.query.page as string;
       const limitRaw = req.query.limit as string;
-      const search = (req.query.search as string) || "";
+      const search = (req.query.q as string) || "";
       const page = parseInt(pageRaw);
       const limit = parseInt(limitRaw);
+
+      console.log("Search params - page:", page, "limit:", limit, "search:", search);
 
       if ((pageRaw !== undefined && isNaN(page)) || (limitRaw !== undefined && isNaN(limit))) {
         throw new BadRequestError("Paramètres de pagination non numériques");
