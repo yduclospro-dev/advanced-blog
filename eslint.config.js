@@ -1,0 +1,25 @@
+import tseslint from "@typescript-eslint/eslint-plugin";
+import tsParser from "@typescript-eslint/parser";
+
+export default [
+  {
+    ignores: [
+      "out/**",
+      "build/**",
+      "tests/jest.back.cjs",
+      "tests/jest.config.cjs"
+    ],
+  },
+  {
+    files: ["**/*.ts", "**/*.tsx"],
+    languageOptions: {
+      parser: tsParser,
+    },
+    plugins: {
+      "@typescript-eslint": tseslint,
+    },
+    rules: {
+      // Ajoute ici tes règles personnalisées si besoin
+    },
+  },
+];

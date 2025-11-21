@@ -49,6 +49,9 @@ jobs:
             sleep 2
           done
 
+      - name: Linter (ESLint)
+        run: npm run lint
+
       - name: Lancer les tests
         env:
           DATABASE_URL: "postgresql://test:test@localhost:5434/advanced_blog_test?schema=public"
