@@ -53,4 +53,5 @@ jobs:
         env:
           DATABASE_URL: "postgresql://test:test@localhost:5434/advanced_blog_test?schema=public"
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
         run: npm run test
