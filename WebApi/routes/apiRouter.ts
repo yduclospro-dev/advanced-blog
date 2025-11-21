@@ -17,22 +17,7 @@ const articleController = new ArticleController(articleService);
 const imageController = new ImageController(imageUploadService);
 const passwordResetController = new PasswordResetController(passwordResetService, emailService);
 
-const prisma = new PrismaClient();
-apiRouter.get('/', async (req, res) => {
-  res.send('API is running');
-});
 
-apiRouter.get('/healthz', async (req, res) => {
-  const start = Date.now();
-  try {
-    await prisma.user.count();
-    const duration = Date.now() - start;
-    res.status(200).json({ status: 'ok', db: 'ok', durationMs: duration });
-  } catch (e) {
-    const duration = Date.now() - start;
-    res.status(503).json({ status: 'error', db: 'unreachable', durationMs: duration });
-  }
-});
 
 apiRouter.post('/register', userController.register.bind(userController));
 apiRouter.post('/login', userController.login.bind(userController));
