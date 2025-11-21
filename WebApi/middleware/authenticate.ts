@@ -11,8 +11,15 @@ if (!JWT_SECRET) {
 }
 
 export function authenticate(req: Request, res: Response, next: NextFunction) {
+
     log("cookies:", req.cookies);
-    const token = req.cookies && req.cookies.refresh_token;
+    let token: string | undefined;
+    const authHeader = req.headers.authorization;
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+        token = authHeader.substring(7);
+    } else if (req.cookies && req.cookies.refresh_token) {
+        token = req.cookies.refresh_token;
+    }
 
     if (!token) {
         return sendApiResponse(res, {

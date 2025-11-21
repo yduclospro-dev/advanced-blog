@@ -17,22 +17,22 @@ describe('POST /api/refresh', () => {
     const res = await request(app)
       .post('/api/login')
       .send({ email, password: 'password123' });
-    refreshToken = res.body.refreshToken;
+    refreshToken = res.body.result.refreshToken;
   });
 
   it('should refresh token with valid refreshToken', async () => {
     const res = await request(app)
       .post('/api/refresh')
-      .send({ refreshToken });
+      .set('Cookie', `refresh_token=${refreshToken}`);
     expect(res.status).toBe(200);
-    expect(res.body).toHaveProperty('accessToken');
-    expect(res.body).toHaveProperty('refreshToken');
+    expect(res.body.result).toHaveProperty('accessToken');
+    expect(res.body.result).toHaveProperty('refreshToken');
   });
 
   it('should fail with invalid refreshToken', async () => {
     const res = await request(app)
       .post('/api/refresh')
-      .send({ refreshToken: 'invalidtoken' });
+      .set('Cookie', 'refresh_token=invalidtoken');
     expect(res.status).toBe(401);
   });
 });
