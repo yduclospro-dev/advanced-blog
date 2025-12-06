@@ -5,12 +5,15 @@ import { UserService } from "@app/services/User/UserService";
 import type { UserDto } from '@app/dtos/User/UserDto';
 import { UnauthorizedError, NotFoundError } from "@domain/errors";
 import { validateRequiredFields } from "@webapi/utils/validation";
+import { AuthRateLimitService } from '../../Infrastructure/services/AuthRateLimitService';
 
 export class UserController {
   private userService: UserService;
+  private authRateLimitService: AuthRateLimitService;
 
   constructor(userService: UserService) {
     this.userService = userService;
+    this.authRateLimitService = new AuthRateLimitService();
   }
 
   async register(req: Request, res: Response, next: NextFunction) {
@@ -51,13 +54,16 @@ export class UserController {
       }
 
       validateRequiredFields(req.body, ['email', 'password']);
-
       const { email, password } = req.body;
+
+      await this.authRateLimitService.checkOrThrow(email);
+
       const user = await this.userService.verifyCredentials(email, password);
       const accessToken = this.generateToken(user);
 
       const refreshSecret = process.env.JWT_SECRET;
       if (!refreshSecret) throw new Error('JWT_SECRET non défini');
+     
       const refreshToken = jwt.sign({ userId: user.id, email: user.email, role: user.role }, refreshSecret, { expiresIn: 7 * 24 * 60 * 60 });
 
       res.cookie('refresh_token', refreshToken, {
@@ -66,6 +72,8 @@ export class UserController {
         sameSite: 'lax',
         maxAge: 7 * 24 * 60 * 60 * 1000
       });
+
+      await this.authRateLimitService.resetAttempts(email);
 
       sendApiResponse(res, {
         success: true,

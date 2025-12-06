@@ -77,7 +77,7 @@ https://documenter.getpostman.com/view/50257644/2sB3dHUsNp
 
 ## Tests
 
-Les tests utilisent Jest et une base PostgreSQL lancée via Docker.
+Les tests utilisent Jest et une base PostgreSQL temporaire lancée via Docker.
 
 Avant de lancer les tests :
 1. Docker Desktop doit être actif
