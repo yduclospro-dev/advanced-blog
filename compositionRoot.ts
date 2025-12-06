@@ -7,6 +7,7 @@ import { ImageUploadService } from "@app/services/Image/ImageUploadService";
 import { CommentService } from "@app/services/Comment/CommentService";
 import { PasswordResetService } from "@app/services/User/PasswordResetService";
 import { EmailService } from "@infra/services/EmailService";
+import { AuthRateLimitService } from "@infra/services/AuthRateLimitService";
 
 const userRepository = new UserRepository();
 const articleRepository = new ArticleRepository();
@@ -16,6 +17,6 @@ export const userService = new UserService(userRepository);
 export const articleService = new ArticleService(articleRepository);
 export const imageUploadService = new ImageUploadService();
 export const commentService = new CommentService(commentRepository);
-
 export const emailService = new EmailService();
 export const passwordResetService = new PasswordResetService(userService);
+export const authRateLimitService = new AuthRateLimitService();
