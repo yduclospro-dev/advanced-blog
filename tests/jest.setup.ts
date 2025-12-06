@@ -6,6 +6,25 @@ jest.mock('@/components/ClientOnly', () => ({
 	default: ({ children }: { children: React.ReactNode }) => children
 }));
 
+jest.mock('@infra/redisClient', () => {
+  const redisClientMock = {
+	get: jest.fn(),
+	incr: jest.fn(),
+	expire: jest.fn(),
+	set: jest.fn(),
+	del: jest.fn(),
+  };
+
+  // valeurs par défaut
+  (redisClientMock.get as jest.Mock).mockResolvedValue(null);
+  (redisClientMock.incr as jest.Mock).mockResolvedValue(1);
+
+  return {
+	__esModule: true,
+	redisClient: redisClientMock,
+  };
+});
+
 // Provide a noop for window.matchMedia which some components may use
 Object.defineProperty(window, 'matchMedia', {
 	writable: true,
@@ -129,7 +148,7 @@ jest.mock('next/navigation', () => {
 	return {
 		__esModule: true,
 		useRouter: () => ({ push, replace, prefetch }),
-	useSearchParams: () => ({ get: () => null }),
+		useSearchParams: () => ({ get: () => null }),
 		useParams: () => ({}),
 	};
 });

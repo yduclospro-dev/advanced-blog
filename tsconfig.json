@@ -22,7 +22,6 @@
       "@domain/*": ["./Domain/*"],
       "@infra/*": ["./Infrastructure/*"],
       "@webapi/*": ["./WebApi/*"],
-      "@prisma/*": ["./prisma/*"],
       "@root/*": ["./*"]
     }
   },
@@ -32,6 +31,7 @@
     "Domain/**/*",
     "Infrastructure/**/*",
     "WebApi/**/*",
+    "tests/**/*",
     "prisma/**/*",
     "**/*.mts",
   ],
