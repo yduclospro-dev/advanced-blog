@@ -32,7 +32,9 @@ export function createApp() {
     try {
       await prisma.user.count();
       res.send("OK");
-    } catch {}
+    } catch {
+      res.status(500).send("ERROR");
+    }
   });
 
   app.use("/api", apiRouter);
