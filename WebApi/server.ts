@@ -1,10 +1,12 @@
 import express from "express";
 import cors from "cors";
 import helmet from "helmet";
+import swaggerUi from "swagger-ui-express";
 import apiRouter from "@webapi/routes/apiRouter";
 import cookieParser from 'cookie-parser';
 import { errorHandler } from "@webapi/middleware/errorHandler";
 import { createCompositionRoot } from "@root/compositionRoot";
+import { swaggerSpec } from "@root/swagger.config";
 
 const port = Number(process.env.PORT || 3000);
 
@@ -33,6 +35,16 @@ export function createApp() {
     } catch {
       res.status(500).send("ERROR");
     }
+  });
+
+  app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
+    customCss: '.swagger-ui .topbar { display: none }',
+    customSiteTitle: 'Advanced Blog API Documentation'
+  }));
+  
+  app.get('/api-docs.json', (req, res) => {
+    res.setHeader('Content-Type', 'application/json');
+    res.send(swaggerSpec);
   });
 
   app.use("/api", apiRouter);
