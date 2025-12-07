@@ -4,7 +4,7 @@
     "allowImportingTsExtensions": false,
     "noEmit": false,
     "outDir": "dist",
-    "module": "ESNext",
+    "module": "CommonJS",
     "moduleResolution": "node",
     "target": "ES2020",
 
