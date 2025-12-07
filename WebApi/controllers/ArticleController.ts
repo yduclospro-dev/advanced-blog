@@ -55,7 +55,6 @@ export class ArticleController {
 
   async create(req: Request, res: Response, next: NextFunction) {
     try {
-      console.log("Creating article, req.user:", req.user);
       const authorId = req.user?.id;
       if (!authorId) {
         throw new UnauthorizedError("Utilisateur non authentifié");

@@ -11,13 +11,8 @@ export function authenticate(req: Request, res: Response, next: NextFunction) {
     return res.status(500).json({ error: "Erreur serveur : secret JWT manquant" });
   }
 
-  console.log("secret JWT is set: ", secret);
-  console.log("Authenticating request...");
-  console.log("header:", req.headers);
-
   const auth = req.headers.authorization;
   if (!auth) {
-    console.error("Token manquant dans l'en-tête Authorization");
     return res.status(401).json({ error: "Token manquant" });
   }
 

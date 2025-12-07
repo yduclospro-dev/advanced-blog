@@ -3,10 +3,12 @@ import waitOn from "wait-on";
 async function main() {
   console.log("⏳ [wait-for-db] Starting...");
 
-  const isDocker = process.env.TEST_IN_DOCKER === "true";
-  const host = isDocker ? "postgres" : "localhost";
+  // Always use localhost when running from host machine
+  // The test runner inside Docker will use "postgres" via DATABASE_URL
+  const host = "localhost";
+  const port = process.env.TEST_IN_DOCKER === "true" ? "5433" : "5432";
 
-  const resource = `tcp:${host}:5432`;
+  const resource = `tcp:${host}:${port}`;
   console.log(`🔍 [wait-for-db] Checking resource: ${resource}`);
 
   try {

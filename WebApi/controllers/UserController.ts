@@ -64,8 +64,7 @@ export class UserController {
       const refreshSecret = process.env.JWT_SECRET;
       if (!refreshSecret) throw new Error('JWT_SECRET non défini');
      
-      console.log("Secret utilisé pour SIGNER :", process.env.JWT_SECRET);
-      const refreshToken = jwt.sign({ userId: user.id, email: user.email, role: user.role }, refreshSecret, { expiresIn: 7 * 24 * 60 * 60 });
+      const refreshToken = jwt.sign({ id: user.id, email: user.email, role: user.role }, refreshSecret, { expiresIn: 7 * 24 * 60 * 60 });
 
       res.cookie('refresh_token', refreshToken, {
         httpOnly: true,
@@ -137,13 +136,13 @@ export class UserController {
       } catch {
         throw new UnauthorizedError('Refresh token invalide ou expiré');
       }
-      const user = await this.userService.findById((decoded as { userId: string }).userId);
+      const user = await this.userService.findById((decoded as { id: string }).id);
       if (!user) {
         throw new UnauthorizedError('Utilisateur non trouvé');
       }
       const accessToken = this.generateToken(user);
 
-      const newRefreshToken = jwt.sign({ userId: user.id, email: user.email, role: user.role }, secret, { expiresIn: 7 * 24 * 60 * 60 });
+      const newRefreshToken = jwt.sign({ id: user.id, email: user.email, role: user.role }, secret, { expiresIn: 7 * 24 * 60 * 60 });
       res.cookie('refresh_token', newRefreshToken, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
@@ -200,7 +199,7 @@ export class UserController {
 
     return jwt.sign(
       {
-        userId: user.id,
+        id: user.id,
         email: user.email,
         role: user.role
       },      
