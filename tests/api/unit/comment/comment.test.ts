@@ -14,10 +14,9 @@ describe('Comments API', () => {
 
   beforeAll(async () => {
     app = createApp();
-    const name = unique('commentuser');
+    const name = unique("commentuser");
     const email = `${name}@example.com`;
 
-    // Register and login
     await request(app)
       .post('/api/register')
       .send({ userName: name, email, password: 'password123' });
@@ -28,7 +27,6 @@ describe('Comments API', () => {
 
     accessToken = loginRes.body.result.accessToken;
 
-    // Create an article
     const articleRes = await request(app)
       .post('/api/articles')
       .set('Authorization', `Bearer ${accessToken}`)
@@ -144,7 +142,6 @@ describe('Comments API', () => {
     });
 
     it('should fail if user is not the author', async () => {
-      // Create another user
       const name2 = unique('commentuser2');
       const email2 = `${name2}@example.com`;
       
@@ -169,7 +166,6 @@ describe('Comments API', () => {
 
   describe('DELETE /api/comments/:id', () => {
     it('should fail if user is not the author', async () => {
-      // Create another user
       const name3 = unique('commentuser3');
       const email3 = `${name3}@example.com`;
       

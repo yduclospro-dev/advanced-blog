@@ -6,7 +6,6 @@ const isTest =
 
 let redisClient: ReturnType<typeof createClient> | null = null;
 
-// Mock Redis pour Jest
 const mockRedis = {
   get: async () => null,
   set: async () => null,

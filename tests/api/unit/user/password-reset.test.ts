@@ -15,7 +15,6 @@ describe("Password Reset Flow", () => {
     const name = unique("resetuser");
     userEmail = `${name}@example.com`;
 
-    // Register a user
     await request(app)
       .post("/api/register")
       .send({
@@ -31,7 +30,6 @@ describe("Password Reset Flow", () => {
         .post("/api/forgot-password")
         .send({ email: userEmail });
 
-      // Should return 200 even if email sending fails (to prevent email enumeration)
       expect([200, 500]).toContain(res.status);
     });
 
@@ -40,7 +38,6 @@ describe("Password Reset Flow", () => {
         .post("/api/forgot-password")
         .send({ email: "nonexistent@example.com" });
 
-      // Should not reveal if email exists
       expect([200, 404]).toContain(res.status);
     });
 
@@ -61,7 +58,6 @@ describe("Password Reset Flow", () => {
     });
 
     it("should fail if user is already authenticated", async () => {
-      // Login first
       const loginRes = await request(app)
         .post("/api/login")
         .send({ email: userEmail, password: "oldpassword123" });
@@ -73,7 +69,6 @@ describe("Password Reset Flow", () => {
         .set("Authorization", `Bearer ${accessToken}`)
         .send({ email: userEmail });
 
-      // ensureNotAuthenticated middleware should block this
       expect(res.status).toBe(400);
     });
   });
@@ -96,7 +91,6 @@ describe("Password Reset Flow", () => {
     });
 
     it("should fail if user is already authenticated", async () => {
-      // Login first
       const loginRes = await request(app)
         .post("/api/login")
         .send({ email: userEmail, password: "oldpassword123" });
@@ -111,7 +105,6 @@ describe("Password Reset Flow", () => {
           newPassword: "newpassword123"
         });
 
-      // ensureNotAuthenticated middleware should block this
       expect(res.status).toBe(400);
     });
   });

@@ -18,7 +18,6 @@ export default [
       "@typescript-eslint": tseslint,
     },
     rules: {
-      // Ajoute ici tes règles personnalisées si besoin
     },
   },
 ];

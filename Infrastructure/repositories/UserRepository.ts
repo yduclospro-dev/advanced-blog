@@ -33,7 +33,7 @@ export class UserRepository implements IUserRepository {
     if (!found) return null;
     return new User(found.userName, found.email, found.password, found.role, found.id);
   }
-  // ...existing code...
+
   async findByUserName(userName: string): Promise<User | null> {
     const found = await prisma.user.findUnique({ where: { userName } });
     if (!found) return null;

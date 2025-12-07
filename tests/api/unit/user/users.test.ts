@@ -12,7 +12,6 @@ describe("GET /api/users", () => {
   beforeAll(async () => {
     app = createApp();
 
-    // Create multiple users for testing
     for (let i = 1; i <= 3; i++) {
       const name = unique(`listuser${i}`);
       await request(app)
