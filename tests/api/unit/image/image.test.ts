@@ -16,7 +16,6 @@ describe("Image Upload API", () => {
     const name = unique("imageuser");
     const email = `${name}@example.com`;
 
-    // Register and login
     await request(app)
       .post("/api/register")
       .send({ userName: name, email, password: "password123" });
@@ -51,12 +50,10 @@ describe("Image Upload API", () => {
         .set("Authorization", `Bearer ${accessToken}`)
         .attach("wrongField", Buffer.from("fake image"), "test.jpg");
 
-      // Multer returns 500 for unexpected field
       expect(res.status).toBe(500);
     });
 
     it("should handle image upload request (may fail without Cloudinary)", async () => {
-      // Create a minimal valid image buffer (1x1 PNG)
       const pngBuffer = Buffer.from([
         0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a,
         0x00, 0x00, 0x00, 0x0d, 0x49, 0x48, 0x44, 0x52,
@@ -74,13 +71,11 @@ describe("Image Upload API", () => {
         .set("Authorization", `Bearer ${accessToken}`)
         .attach("image", pngBuffer, "test.png");
 
-      // Should succeed if Cloudinary is configured, otherwise fail gracefully
       if (res.status === 200) {
         expect(res.body.success).toBe(true);
         expect(res.body.result).toHaveProperty("imageUrl");
         uploadedImageUrl = res.body.result.imageUrl;
       } else {
-        // If Cloudinary is not configured, expect 500 or specific error
         expect([500]).toContain(res.status);
       }
     });
@@ -112,8 +107,6 @@ describe("Image Upload API", () => {
         .set("Authorization", `Bearer ${accessToken}`)
         .send({ imageUrl: testImageUrl });
 
-      // Should succeed if Cloudinary is configured and image exists
-      // Otherwise may return 500
       expect([200, 500]).toContain(res.status);
     });
   });

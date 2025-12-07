@@ -3,7 +3,6 @@ import dotenv from "dotenv";
 
 dotenv.config({ path: ".env.test" });
 
-// Render ClientOnly children synchronously in tests to avoid the fallback 'Chargement...' UI
 jest.mock('@/components/ClientOnly', () => ({
 	__esModule: true,
 	default: ({ children }: { children: React.ReactNode }) => children
@@ -18,7 +17,6 @@ jest.mock('@infra/redisClient', () => {
 	del: jest.fn(),
   };
 
-  // valeurs par défaut
   (redisClientMock.get as jest.Mock).mockResolvedValue(null);
   (redisClientMock.incr as jest.Mock).mockResolvedValue(1);
 
@@ -36,7 +34,6 @@ jest.mock("resend", () => {
   };
 });
 
-// Provide a noop for window.matchMedia which some components may use
 Object.defineProperty(window, 'matchMedia', {
 	writable: true,
 	value: (query: string) => ({
@@ -51,13 +48,9 @@ Object.defineProperty(window, 'matchMedia', {
 	})
 });
 
-// Polyfill for jsdom: HTMLFormElement.requestSubmit is not implemented in older jsdom versions
-// Some tests (and @testing-library/dom) call requestSubmit via button interactions. Provide a
-// small shim that delegates to a submit button click or falls back to form.submit().
 if (typeof HTMLFormElement !== 'undefined' && !HTMLFormElement.prototype.requestSubmit) {
 	HTMLFormElement.prototype.requestSubmit = function (this: HTMLFormElement & { submit?: () => void }, submitter?: Element | null) {
 		try {
-			// If a submitter element with a click handler is provided, prefer it
 			if (submitter && typeof (submitter as HTMLElement | { click?: unknown }).click === 'function') {
 				(submitter as HTMLElement).click();
 				return;
@@ -69,18 +62,14 @@ if (typeof HTMLFormElement !== 'undefined' && !HTMLFormElement.prototype.request
 				return;
 			}
 
-			// Fallback to the native submit if available on the form element
 			if (typeof this.submit === 'function') {
 				this.submit();
 			}
 		} catch {
-			// swallow - tests shouldn't fail because of the shim
 		}
 	};
 }
 
-// Provide a lightweight test implementation for useUserStore (zustand) so store unit tests
-// and components relying on the user store API can run in Jest without hitting real persistence or network.
 type TestUser = {
 	id: string;
 	username?: string;
@@ -129,7 +118,6 @@ useUserStore.getState = () => _state;
 useUserStore.setState = (partial: Partial<TestState>) => updateState(partial);
 useUserStore.subscribe = () => () => {};
 
-// API helpers expected by tests
 useUserStore.getState().addUser = (user: TestUser) => {
 	if (!user?.id || !user?.username || !user?.email || !user?.password) return false;
 	_state = { ..._state, users: [..._state.users, user] };
@@ -148,9 +136,6 @@ useUserStore.getState().register = async () => ({ success: false });
 
 jest.mock('@/stores/userStore', () => ({ useUserStore }));
 
-// Provide a default mock for Next.js navigation hooks used in client components
-// This prevents the "invariant expected app router to be mounted" error when
-// a test doesn't mock `next/navigation` explicitly.
 jest.mock('next/navigation', () => {
 	const push = jest.fn();
 	const replace = jest.fn();
@@ -164,9 +149,6 @@ jest.mock('next/navigation', () => {
 	};
 });
 
-// Mock the axios instance used by the app so store unit tests don't hit the network.
-// The mock provides minimal get/post/put/delete implementations returning
-// objects shaped like Axios responses ({ data }). Tests rely on these shapes.
 jest.mock('@/utils/axios', () => {
 	const mock = {
 		get: jest.fn(() => Promise.resolve({ data: [] })),
@@ -192,22 +174,13 @@ jest.mock('@/utils/axios', () => {
 	return { __esModule: true, default: mock };
 });
 
-// Quiet noisy console.error output during tests by default.
-// Set QUIET_TEST_ERRORS=false in the environment to see errors as usual.
 const _origConsoleError = console.error;
 const quietErrors = process.env.QUIET_TEST_ERRORS !== 'false';
 
 if (quietErrors) {
-	// Replace console.error with a no-op that can be toggled back in tests
 	console.error = () => {
-		// no-op by default during tests
 	};
 
-	// Expose helpers for tests that need to assert on console.error output
-	// Usage in a test:
-	//   const restore = (globalThis as any).__unquietConsoleErrors();
-	//   // run code that should log errors
-	//   restore();
 	interface QuietHelpers {
 		__quietConsoleErrors: () => () => void;
 		__unquietConsoleErrors: () => () => void;

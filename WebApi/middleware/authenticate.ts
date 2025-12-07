@@ -5,8 +5,6 @@ export function authenticate(req: Request, res: Response, next: NextFunction) {
   const secret = process.env.JWT_SECRET;
 
   if (!secret) {
-    // En test, on NE DOIT PAS planter l'appli…
-    // mais on doit renvoyer une erreur claire.
     console.error("JWT_SECRET non défini");
     return res.status(500).json({ error: "Erreur serveur : secret JWT manquant" });
   }
@@ -20,8 +18,7 @@ export function authenticate(req: Request, res: Response, next: NextFunction) {
 
   try {
     const payload = jwt.verify(token, secret);
-    // @ts-expect-error
-    req.user = payload;
+    req.user = payload as any;
     next();
   } catch {
     return res.status(401).json({ error: "Token invalide" });

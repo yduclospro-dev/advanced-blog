@@ -15,7 +15,6 @@ describe("GET /api/articles/search", () => {
     const name = unique("searchuser");
     const email = `${name}@example.com`;
 
-    // Register and login
     await request(app)
       .post("/api/register")
       .send({ userName: name, email, password: "password123" });
@@ -26,7 +25,6 @@ describe("GET /api/articles/search", () => {
 
     accessToken = loginRes.body.result.accessToken;
 
-    // Create multiple articles for search testing
     await request(app)
       .post("/api/articles")
       .set("Authorization", `Bearer ${accessToken}`)
