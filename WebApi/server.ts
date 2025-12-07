@@ -7,6 +7,7 @@ import cookieParser from 'cookie-parser';
 import { errorHandler } from "@webapi/middleware/errorHandler";
 import { createCompositionRoot } from "@root/compositionRoot";
 import { swaggerSpec } from "@root/swagger.config";
+import { serverAdapter } from "@infra/queues/bullBoard";
 
 const port = Number(process.env.PORT || 3000);
 
@@ -16,7 +17,15 @@ export function createApp() {
 
   app.use(express.json());
   app.use(cookieParser());
-  app.use(helmet());
+  app.use(helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        styleSrc: ["'self'", "'unsafe-inline'"],
+        scriptSrc: ["'self'", "'unsafe-inline'"],
+      },
+    },
+  }));
 
   const allowedOrigins = process.env.NODE_ENV === "production"
     ? [process.env.CORS_ORIGIN || "https://advanced-blog-4j0k.onrender.com"]
@@ -46,6 +55,13 @@ export function createApp() {
     res.setHeader('Content-Type', 'application/json');
     res.send(swaggerSpec);
   });
+
+  // Bull Board monitoring dashboard
+  try {
+    app.use('/admin/queues', serverAdapter.getRouter());
+  } catch (error) {
+    console.warn('Bull Board not available:', error);
+  }
 
   app.use("/api", apiRouter);
   app.use(errorHandler);

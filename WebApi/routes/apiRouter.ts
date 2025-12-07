@@ -16,14 +16,13 @@ const {
     articleService, 
     imageUploadService, 
     commentService, 
-    passwordResetService, 
-    emailService } = createCompositionRoot();
+    passwordResetService } = createCompositionRoot();
 
 const commentController = new CommentController(commentService, articleService);
 const userController = new UserController(userService);
 const articleController = new ArticleController(articleService);
 const imageController = new ImageController(imageUploadService);
-const passwordResetController = new PasswordResetController(passwordResetService, emailService);
+const passwordResetController = new PasswordResetController(passwordResetService);
 
 /**
  * @swagger
