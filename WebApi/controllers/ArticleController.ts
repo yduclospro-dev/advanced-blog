@@ -18,10 +18,10 @@ export class ArticleController {
       const pageRaw = req.query.page as string;
       const limitRaw = req.query.limit as string;
       const search = (req.query.q as string) || "";
-      const page = parseInt(pageRaw);
-      const limit = parseInt(limitRaw);
+      const page = pageRaw ? parseInt(pageRaw) : 1;
+      const limit = limitRaw ? parseInt(limitRaw) : 10;
 
-      if ((pageRaw !== undefined && isNaN(page)) || (limitRaw !== undefined && isNaN(limit))) {
+      if (isNaN(page) || isNaN(limit)) {
         throw new BadRequestError("Paramètres de pagination non numériques");
       }
 

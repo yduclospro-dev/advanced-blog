@@ -26,14 +26,10 @@ describe("Articles API", () => {
 
     accessToken = loginRes.body.result.accessToken;
 
-    console.log("Obtained access token:", accessToken);
-
     const articleRes = await request(app)
       .post("/api/articles")
       .set("Authorization", `Bearer ${accessToken}`)
       .send({ title: "Test Article", content: "Test content" });
-
-      console.log("Created article response:", articleRes.body);
 
     articleId = articleRes.body.result.id;
   });

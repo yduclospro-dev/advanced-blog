@@ -64,12 +64,13 @@ export class CommentController {
     try {
       const id = req.params.id;
       const existing = await this.commentService.getCommentById(id);
-      if (existing?.userId !== req.user?.id) {
-        throw new ForbiddenError('Action interdite');
-      }
       
       if (!existing) {
         throw new NotFoundError('Commentaire non trouvé');
+      }
+
+      if (existing.userId !== req.user?.id) {
+        throw new ForbiddenError('Action interdite');
       }
 
       validateRequiredFields(req.body, ["content"]);
@@ -90,12 +91,13 @@ export class CommentController {
     try {
       const id = req.params.id;
       const existing = await this.commentService.getCommentById(id);
-      if (existing?.userId !== req.user?.id) {
-        throw new ForbiddenError('Action interdite');
-      }
       
       if (!existing) {
         throw new NotFoundError('Commentaire non trouvé');
+      }
+
+      if (existing.userId !== req.user?.id) {
+        throw new ForbiddenError('Action interdite');
       }
       
       await this.commentService.deleteComment(id);
