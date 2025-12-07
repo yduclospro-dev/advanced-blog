@@ -9,18 +9,25 @@ function getRedisConfig(): QueueOptions {
   
   // If it's a rediss:// URL (like Upstash), Bull needs TLS config
   if (redisUrl.startsWith("rediss://")) {
-    const hostWithPort = redisUrl.replace("rediss://", "");
-    const [host] = hostWithPort.split(":");
-    
-    return {
-      redis: {
-        port: 6379,
-        host: host,
-        tls: {
-          rejectUnauthorized: false,
+    try {
+      // Parse URL: rediss://default:password@host:port
+      const url = new URL(redisUrl);
+      
+      return {
+        redis: {
+          host: url.hostname,
+          port: parseInt(url.port) || 6379,
+          username: url.username || undefined,
+          password: url.password || undefined,
+          tls: {
+            rejectUnauthorized: false,
+          },
         },
-      },
-    };
+      };
+    } catch (error) {
+      console.error("Failed to parse Redis URL:", error);
+      throw error;
+    }
   }
   
   // For regular redis:// URLs, return as connection option
