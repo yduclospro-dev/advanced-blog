@@ -329,6 +329,22 @@ npm test -- --coverage
 # - 59 tests passing
 # - Tous les cas d'erreur couverts (401, 403, 404, 409, etc.)
 ```
+### Tests manuels avec Postman
+
+Pour tester l'API manuellement, vous pouvez importer les fichiers Postman fournis :
+
+```bash
+# À la racine du projet :
+postman_collection_full.json          # Collection complète avec tous les endpoints
+postman_environment_local.json        # Variables pour environnement local
+postman_environment_production.json   # Variables pour environnement production
+```
+**Étapes** :
+1. Ouvrir Postman
+2. Importer `postman_collection_full.json` (File → Import)
+3. Importer l'environnement souhaité (`postman_environment_local.json` ou `production`)
+4. Sélectionner l'environnement dans le coin supérieur droit
+5. Tester les endpoints (les tokens sont gérés automatiquement)
 
 ### Structure des tests
 
