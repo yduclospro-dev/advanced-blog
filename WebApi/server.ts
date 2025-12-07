@@ -1,4 +1,4 @@
-import { prisma } from "../Infrastructure/prismaClient";
+import { prisma } from "@infra/prismaClient";
 import express from "express";
 import cors from "cors";
 import helmet from "helmet";
