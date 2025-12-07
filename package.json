@@ -5,7 +5,7 @@
   "scripts": {
     "postinstall": "prisma generate",
     "dev": "tsx scripts/redis-start.ts && tsx -r tsconfig-paths/register WebApi/server.ts",
-    "build": "prisma generate && tsc -p tsconfig.build.json && tsc-alias -p tsconfig.build.json",
+    "build": "prisma generate && prisma migrate deploy && tsc -p tsconfig.build.json && tsc-alias -p tsconfig.build.json",
     "start": "node dist/WebApi/server.js",
     "lint": "eslint .",
     "seed": "prisma db seed",
