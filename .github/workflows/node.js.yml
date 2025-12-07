@@ -66,4 +66,4 @@ jobs:
           REDIS_URL: "redis://localhost:6379"
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
           RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
-        run: npm test
+        run: npm run test:ci
