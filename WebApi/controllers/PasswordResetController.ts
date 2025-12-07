@@ -25,7 +25,6 @@ export class PasswordResetController {
       if (!email) return sendApiResponse(res, { success: false, message: 'Email requis', result: null, statusCode: 400 });
       const token = this.passwordResetService.generateResetToken(email);
       
-      // Send email asynchronously via queue
       await sendPasswordResetEmail(email, token);
       
       sendApiResponse(res, {
