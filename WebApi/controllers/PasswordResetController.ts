@@ -1,15 +1,13 @@
 import type { Request, Response, NextFunction } from 'express';
 import { PasswordResetService } from '@app/services/User/PasswordResetService';
-import { EmailService } from '@infra/services/EmailService';
+import { sendPasswordResetEmail } from '@infra/queues';
 import { sendApiResponse } from '@webapi/utils/response';
 
 export class PasswordResetController {
   private passwordResetService: PasswordResetService;
-  private emailService: EmailService;
   
-  constructor(passwordResetService: PasswordResetService, emailService: EmailService) {
+  constructor(passwordResetService: PasswordResetService) {
     this.passwordResetService = passwordResetService;
-    this.emailService = emailService;
   }
 
   async forgotPassword(req: Request, res: Response, next: NextFunction) {
@@ -26,7 +24,10 @@ export class PasswordResetController {
       const { email } = req.body;
       if (!email) return sendApiResponse(res, { success: false, message: 'Email requis', result: null, statusCode: 400 });
       const token = this.passwordResetService.generateResetToken(email);
-      await this.emailService.sendResetPasswordEmail(email, token);
+      
+      // Send email asynchronously via queue
+      await sendPasswordResetEmail(email, token);
+      
       sendApiResponse(res, {
         success: true,
         message: 'Si cet email existe, un token de réinitialisation a été envoyé.',
