@@ -7,12 +7,11 @@ function unique(prefix: string) {
 }
 
 describe('GET /api/me', () => {
-  let app: ReturnType<typeof createApp> = createApp();
+  let app: ReturnType<typeof createApp>;
   let accessToken: string;
 
   beforeAll(async () => {
     app = createApp();
-
     const name = unique('meuser');
     const email = `${name}@example.com`;
     await request(app)

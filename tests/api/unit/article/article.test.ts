@@ -1,15 +1,18 @@
+import "@root/loadEnv";
 import request from "supertest";
-import { app } from "../../../globalApp";
+import { createApp } from "@webapi/server";
 
 function unique(prefix: string) {
   return `${prefix}_${Date.now().toString(36)}_${Math.random().toString(36).slice(2,8)}`;
 }
 
 describe("Articles API", () => {
+  let app: ReturnType<typeof createApp>;
   let accessToken: string;
   let articleId: string;
 
   beforeAll(async () => {
+    app = createApp();
     const name = unique("articleuser");
     const email = `${name}@example.com`;
 

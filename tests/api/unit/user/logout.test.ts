@@ -12,7 +12,6 @@ describe('POST /api/logout', () => {
 
   beforeAll(async () => {
     app = createApp();
-
     const name = unique('logoutuser');
     const email = `${name}@example.com`;
     await request(app)
