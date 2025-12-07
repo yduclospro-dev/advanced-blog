@@ -22,14 +22,20 @@ export function getRedisClient() {
   if (!redisClient) {
     redisClient = createClient({
       url: process.env.REDIS_URL || "redis://redis:6379",
-      socket: { connectTimeout: 2000 },
+      socket: { connectTimeout: 5000 },
     });
 
     redisClient.on("error", (err) => {
       console.error("Redis connection error:", err);
     });
 
-    redisClient.connect();
+    redisClient.on("connect", () => {
+      console.log("Redis connected successfully");
+    });
+
+    redisClient.connect().catch((err) => {
+      console.error("Failed to connect to Redis:", err);
+    });
   }
 
   return redisClient;

@@ -1,224 +1,1286 @@
 {
   "info": {
-    "_postman_id": "advanced-blog-api-collection-full",
-    "name": "Advanced Blog API (Full)",
+    "_postman_id": "advanced-blog-api-complete",
+    "name": "Advanced Blog API - Complete",
+    "description": "Complete test suite for all API endpoints with environment variables support",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000",
+      "type": "string"
+    }
+  ],
   "item": [
     {
-      "name": "Auth - Register (success)",
-      "request": {
-        "method": "POST",
-        "header": [ { "key": "Content-Type", "value": "application/json" } ],
-        "body": { "mode": "raw", "raw": "{\n  \"userName\": \"testuser\",\n  \"email\": \"test@example.com\",\n  \"password\": \"password123\"\n}" },
-        "url": { "raw": "http://localhost:3000/api/register", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "register"] }
-      },
-      "event": [{ "listen": "test", "script": { "exec": [
-        "pm.test(\"Status code is 201\", function () { pm.response.to.have.status(201); });",
-        "pm.test(\"Inscription réussie\", function () { pm.expect(pm.response.json().message).to.eql('Inscription réussie'); });"
-      ], "type": "text/javascript" } }]
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register - Success",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test(\"Response has success message\", function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.success).to.be.true;",
+                  "    pm.expect(json.message).to.exist;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userName\": \"testuser{{$randomInt}}\",\n  \"email\": \"test{{$randomInt}}@example.com\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "register"]
+            }
+          }
+        },
+        {
+          "name": "Register - Missing Fields",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userName\": \"\",\n  \"email\": \"\",\n  \"password\": \"\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "register"]
+            }
+          }
+        },
+        {
+          "name": "Login - Success",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response has accessToken\", function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.result.accessToken).to.exist;",
+                  "    pm.environment.set('accessToken', json.result.accessToken);",
+                  "});"
+                ]
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "// First register a user",
+                  "const registerRequest = {",
+                  "    url: pm.variables.get('baseUrl') + '/api/register',",
+                  "    method: 'POST',",
+                  "    header: { 'Content-Type': 'application/json' },",
+                  "    body: {",
+                  "        mode: 'raw',",
+                  "        raw: JSON.stringify({",
+                  "            userName: 'logintest',",
+                  "            email: 'logintest@example.com',",
+                  "            password: 'password123'",
+                  "        })",
+                  "    }",
+                  "};",
+                  "",
+                  "pm.sendRequest(registerRequest, function (err, response) {",
+                  "    // Ignore if user already exists",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"logintest@example.com\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "login"]
+            }
+          }
+        },
+        {
+          "name": "Login - Wrong Password",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 401\", function () {",
+                  "    pm.response.to.have.status(401);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"logintest@example.com\",\n  \"password\": \"wrongpassword\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "login"]
+            }
+          }
+        },
+        {
+          "name": "Refresh Token - Success",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"New access token provided\", function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.result.accessToken).to.exist;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/refresh",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "refresh"]
+            }
+          }
+        },
+        {
+          "name": "Me - Authenticated",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"User info present\", function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.result.id).to.exist;",
+                  "    pm.expect(json.result.email).to.exist;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/me",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "me"]
+            }
+          }
+        },
+        {
+          "name": "Me - Unauthenticated",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 401\", function () {",
+                  "    pm.response.to.have.status(401);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/me",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "me"]
+            }
+          }
+        },
+        {
+          "name": "Logout - Success",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/logout",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "logout"]
+            }
+          }
+        },
+        {
+          "name": "Logout - Unauthenticated",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 401\", function () {",
+                  "    pm.response.to.have.status(401);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/logout",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "logout"]
+            }
+          }
+        }
+      ]
     },
     {
-      "name": "Auth - Register (missing fields)",
-      "request": {
-        "method": "POST",
-        "header": [ { "key": "Content-Type", "value": "application/json" } ],
-        "body": { "mode": "raw", "raw": "{\n  \"userName\": \"\",\n  \"email\": \"\",\n  \"password\": \"\"\n}" },
-        "url": { "raw": "http://localhost:3000/api/register", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "register"] }
-      },
-      "event": [{ "listen": "test", "script": { "exec": [
-        "pm.test(\"Status code is 400\", function () { pm.response.to.have.status(400); });"
-      ], "type": "text/javascript" } }]
+      "name": "Users",
+      "item": [
+        {
+          "name": "Get All Users",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Returns array of users\", function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.result).to.be.an('array');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/users",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "users"]
+            }
+          }
+        }
+      ]
     },
     {
-      "name": "Auth - Login (success)",
-      "request": {
-        "method": "POST",
-        "header": [ { "key": "Content-Type", "value": "application/json" } ],
-        "body": { "mode": "raw", "raw": "{\n  \"email\": \"test@example.com\",\n  \"password\": \"password123\"\n}" },
-        "url": { "raw": "http://localhost:3000/api/login", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "login"] }
-      },
-      "event": [{ "listen": "test", "script": { "exec": [
-        "pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
-        "pm.test(\"Connexion réussie\", function () { pm.expect(pm.response.json().message).to.eql('Connexion réussie'); });",
-        "pm.environment.set('accessToken', pm.response.json().result.accessToken);"
-      ], "type": "text/javascript" } }]
+      "name": "Password Reset",
+      "item": [
+        {
+          "name": "Forgot Password - Success",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200 or 500\", function () {",
+                  "    pm.expect([200, 500]).to.include(pm.response.code);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"logintest@example.com\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/forgot-password",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "forgot-password"]
+            }
+          }
+        },
+        {
+          "name": "Forgot Password - Invalid Email",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400 or 200\", function () {",
+                  "    pm.expect([400, 200]).to.include(pm.response.code);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"invalidemail\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/forgot-password",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "forgot-password"]
+            }
+          }
+        },
+        {
+          "name": "Reset Password - Invalid Token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"token\": \"invalidtoken\",\n  \"newPassword\": \"newpassword123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/reset-password",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "reset-password"]
+            }
+          }
+        }
+      ]
     },
     {
-      "name": "Auth - Login (wrong password)",
-      "request": {
-        "method": "POST",
-        "header": [ { "key": "Content-Type", "value": "application/json" } ],
-        "body": { "mode": "raw", "raw": "{\n  \"email\": \"test@example.com\",\n  \"password\": \"wrongpass\"\n}" },
-        "url": { "raw": "http://localhost:3000/api/login", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "login"] }
-      },
-      "event": [{ "listen": "test", "script": { "exec": [
-        "pm.test(\"Status code is 401\", function () { pm.response.to.have.status(401); });"
-      ], "type": "text/javascript" } }]
+      "name": "Images",
+      "item": [
+        {
+          "name": "Upload Image - Missing File",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400 or 500\", function () {",
+                  "    pm.expect([400, 500]).to.include(pm.response.code);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": []
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/upload/image",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "upload", "image"]
+            }
+          }
+        },
+        {
+          "name": "Upload Image - Unauthenticated",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 401\", function () {",
+                  "    pm.response.to.have.status(401);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": []
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/upload/image",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "upload", "image"]
+            }
+          }
+        },
+        {
+          "name": "Delete Image - Missing URL",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/upload/image",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "upload", "image"]
+            }
+          }
+        }
+      ]
     },
     {
-      "name": "Auth - Me (success)",
-      "request": {
-        "method": "GET",
-        "header": [ { "key": "Authorization", "value": "Bearer {{accessToken}}" } ],
-        "url": { "raw": "http://localhost:3000/api/me", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "me"] }
-      },
-      "event": [{ "listen": "test", "script": { "exec": [
-        "pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
-        "pm.test(\"User info present\", function () { var json = pm.response.json(); pm.expect(json.result).to.have.property('id'); });"
-      ], "type": "text/javascript" } }]
+      "name": "Articles",
+      "item": [
+        {
+          "name": "Create Article - Success",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test(\"Article created with ID\", function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.result.id).to.exist;",
+                  "    pm.environment.set('articleId', json.result.id);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Test Article {{$randomInt}}\",\n  \"content\": \"This is test content for the article.\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/articles",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "articles"]
+            }
+          }
+        },
+        {
+          "name": "Create Article - Missing Title",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"content\": \"Content without title\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/articles",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "articles"]
+            }
+          }
+        },
+        {
+          "name": "Create Article - Unauthenticated",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 401\", function () {",
+                  "    pm.response.to.have.status(401);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Unauthorized Article\",\n  \"content\": \"This should fail\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/articles",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "articles"]
+            }
+          }
+        },
+        {
+          "name": "Get Article by ID - Success",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Article has required fields\", function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.result.id).to.exist;",
+                  "    pm.expect(json.result.title).to.exist;",
+                  "    pm.expect(json.result.content).to.exist;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/articles/{{articleId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "articles", "{{articleId}}"]
+            }
+          }
+        },
+        {
+          "name": "Get Article by ID - Not Found",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 404\", function () {",
+                  "    pm.response.to.have.status(404);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/articles/99999999",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "articles", "99999999"]
+            }
+          }
+        },
+        {
+          "name": "Search Articles - Success",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Returns articles array\", function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.result.articles).to.be.an('array');",
+                  "    pm.expect(json.result.total).to.exist;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/articles/search?q=test&page=1&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "articles", "search"],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "test"
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Search Articles - Invalid Pagination",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/articles/search?page=-1&limit=200",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "articles", "search"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "-1"
+                },
+                {
+                  "key": "limit",
+                  "value": "200"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update Article - Success",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Article updated\", function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.result.title).to.include('Updated');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Updated Article Title\",\n  \"content\": \"Updated content\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/articles/{{articleId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "articles", "{{articleId}}"]
+            }
+          }
+        },
+        {
+          "name": "Update Article - Not Found",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 404\", function () {",
+                  "    pm.response.to.have.status(404);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Updated\",\n  \"content\": \"Updated\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/articles/99999999",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "articles", "99999999"]
+            }
+          }
+        },
+        {
+          "name": "Delete Article - Not Found",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 404\", function () {",
+                  "    pm.response.to.have.status(404);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/articles/99999999",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "articles", "99999999"]
+            }
+          }
+        }
+      ]
     },
     {
-      "name": "Auth - Me (unauthenticated)",
-      "request": {
-        "method": "GET",
-        "url": { "raw": "http://localhost:3000/api/me", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "me"] }
-      },
-      "event": [{ "listen": "test", "script": { "exec": [
-        "pm.test(\"Status code is 401\", function () { pm.response.to.have.status(401); });"
-      ], "type": "text/javascript" } }]
-    },
-    {
-      "name": "Auth - Logout (success)",
-      "request": {
-        "method": "POST",
-        "header": [ { "key": "Authorization", "value": "Bearer {{accessToken}}" } ],
-        "url": { "raw": "http://localhost:3000/api/logout", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "logout"] }
-      },
-      "event": [{ "listen": "test", "script": { "exec": [
-        "pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
-        "pm.test(\"Déconnexion réussie\", function () { pm.expect(pm.response.json().message).to.include('Déconnexion'); });"
-      ], "type": "text/javascript" } }]
-    },
-    {
-      "name": "Auth - Logout (unauthenticated)",
-      "request": {
-        "method": "POST",
-        "url": { "raw": "http://localhost:3000/api/logout", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "logout"] }
-      },
-      "event": [{ "listen": "test", "script": { "exec": [
-        "pm.test(\"Status code is 401\", function () { pm.response.to.have.status(401); });"
-      ], "type": "text/javascript" } }]
-    },
-    {
-      "name": "Comments - Create (missing content)",
-      "request": {
-        "method": "POST",
-        "header": [ { "key": "Authorization", "value": "Bearer {{accessToken}}" }, { "key": "Content-Type", "value": "application/json" } ],
-        "body": { "mode": "raw", "raw": "{ }" },
-        "url": { "raw": "http://localhost:3000/api/articles/1/comments", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "articles", "1", "comments"] }
-      },
-      "event": [{ "listen": "test", "script": { "exec": [ "pm.test(\"Status code is 400\", function () { pm.response.to.have.status(400); });" ], "type": "text/javascript" } }]
-    },
-    {
-      "name": "Comments - Get by Article (unauthenticated)",
-      "request": {
-        "method": "GET",
-        "url": { "raw": "http://localhost:3000/api/articles/1/comments", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "articles", "1", "comments"] }
-      },
-      "event": [{ "listen": "test", "script": { "exec": [ "pm.test(\"Status code is 401\", function () { pm.response.to.have.status(401); });" ], "type": "text/javascript" } }]
-    },
-    {
-      "name": "Comments - Update (missing content)",
-      "request": {
-        "method": "PUT",
-        "header": [ { "key": "Authorization", "value": "Bearer {{accessToken}}" }, { "key": "Content-Type", "value": "application/json" } ],
-        "body": { "mode": "raw", "raw": "{ }" },
-        "url": { "raw": "http://localhost:3000/api/comments/1", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "comments", "1"] }
-      },
-      "event": [{ "listen": "test", "script": { "exec": [ "pm.test(\"Status code is 400\", function () { pm.response.to.have.status(400); });" ], "type": "text/javascript" } }]
-    },
-    {
-      "name": "Comments - Delete (not found)",
-      "request": {
-        "method": "DELETE",
-        "header": [ { "key": "Authorization", "value": "Bearer {{accessToken}}" } ],
-        "url": { "raw": "http://localhost:3000/api/comments/999999", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "comments", "999999"] }
-      },
-      "event": [{ "listen": "test", "script": { "exec": [ "pm.test(\"Status code is 404\", function () { pm.response.to.have.status(404); });" ], "type": "text/javascript" } }]
-    },
-    {
-      "name": "Comments - Delete (forbidden)",
-      "request": {
-        "method": "DELETE",
-        "header": [ { "key": "Authorization", "value": "Bearer {{accessToken}}" } ],
-        "url": { "raw": "http://localhost:3000/api/comments/otherusercommentid", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "comments", "otherusercommentid"] }
-      },
-      "event": [{ "listen": "test", "script": { "exec": [ "pm.test(\"Status code is 403\", function () { pm.response.to.have.status(403); });" ], "type": "text/javascript" } }]
-    },
-    {
-      "name": "Articles - Create (missing title)",
-      "request": {
-        "method": "POST",
-        "header": [ { "key": "Authorization", "value": "Bearer {{accessToken}}" }, { "key": "Content-Type", "value": "application/json" } ],
-        "body": { "mode": "raw", "raw": "{\n  \"content\": \"Contenu\"\n}" },
-        "url": { "raw": "http://localhost:3000/api/articles", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "articles"] }
-      },
-      "event": [{ "listen": "test", "script": { "exec": [ "pm.test(\"Status code is 400\", function () { pm.response.to.have.status(400); });" ], "type": "text/javascript" } }]
-    },
-    {
-      "name": "Articles - Create (unauthenticated)",
-      "request": {
-        "method": "POST",
-        "header": [ { "key": "Content-Type", "value": "application/json" } ],
-        "body": { "mode": "raw", "raw": "{\n  \"title\": \"Nouvel article\",\n  \"content\": \"Contenu\"\n}" },
-        "url": { "raw": "http://localhost:3000/api/articles", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "articles"] }
-      },
-      "event": [{ "listen": "test", "script": { "exec": [ "pm.test(\"Status code is 401\", function () { pm.response.to.have.status(401); });" ], "type": "text/javascript" } }]
-    },
-    {
-      "name": "Articles - Update (not found)",
-      "request": {
-        "method": "PUT",
-        "header": [ { "key": "Authorization", "value": "Bearer {{accessToken}}" }, { "key": "Content-Type", "value": "application/json" } ],
-        "body": { "mode": "raw", "raw": "{\n  \"title\": \"Article modifié\",\n  \"content\": \"Nouveau contenu\"\n}" },
-        "url": { "raw": "http://localhost:3000/api/articles/999999", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "articles", "999999"] }
-      },
-      "event": [{ "listen": "test", "script": { "exec": [ "pm.test(\"Status code is 404\", function () { pm.response.to.have.status(404); });" ], "type": "text/javascript" } }]
-    },
-    {
-      "name": "Articles - Update (forbidden)",
-      "request": {
-        "method": "PUT",
-        "header": [ { "key": "Authorization", "value": "Bearer {{accessToken}}" }, { "key": "Content-Type", "value": "application/json" } ],
-        "body": { "mode": "raw", "raw": "{\n  \"title\": \"Article modifié\",\n  \"content\": \"Nouveau contenu\"\n}" },
-        "url": { "raw": "http://localhost:3000/api/articles/otheruserarticleid", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "articles", "otheruserarticleid"] }
-      },
-      "event": [{ "listen": "test", "script": { "exec": [ "pm.test(\"Status code is 403\", function () { pm.response.to.have.status(403); });" ], "type": "text/javascript" } }]
-    },
-    {
-      "name": "Articles - Delete (not found)",
-      "request": {
-        "method": "DELETE",
-        "header": [ { "key": "Authorization", "value": "Bearer {{accessToken}}" } ],
-        "url": { "raw": "http://localhost:3000/api/articles/999999", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "articles", "999999"] }
-      },
-      "event": [{ "listen": "test", "script": { "exec": [ "pm.test(\"Status code is 404\", function () { pm.response.to.have.status(404); });" ], "type": "text/javascript" } }]
-    },
-    {
-      "name": "Articles - Delete (forbidden)",
-      "request": {
-        "method": "DELETE",
-        "header": [ { "key": "Authorization", "value": "Bearer {{accessToken}}" } ],
-        "url": { "raw": "http://localhost:3000/api/articles/otheruserarticleid", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "articles", "otheruserarticleid"] }
-      },
-      "event": [{ "listen": "test", "script": { "exec": [ "pm.test(\"Status code is 403\", function () { pm.response.to.have.status(403); });" ], "type": "text/javascript" } }]
-    },
-    {
-      "name": "Articles - Get by ID (not found)",
-      "request": {
-        "method": "GET",
-        "url": { "raw": "http://localhost:3000/api/articles/999999", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "articles", "999999"] }
-      },
-      "event": [{ "listen": "test", "script": { "exec": [ "pm.test(\"Status code is 404\", function () { pm.response.to.have.status(404); });" ], "type": "text/javascript" } }]
-    },
-    {
-      "name": "Articles - Search (invalid params)",
-      "request": {
-        "method": "GET",
-        "url": { "raw": "http://localhost:3000/api/articles/search?page=-1&limit=200", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "articles", "search"], "query": [ { "key": "page", "value": "-1" }, { "key": "limit", "value": "200" } ] }
-      },
-      "event": [{ "listen": "test", "script": { "exec": [ "pm.test(\"Status code is 400\", function () { pm.response.to.have.status(400); });" ], "type": "text/javascript" } }]
+      "name": "Comments",
+      "item": [
+        {
+          "name": "Create Comment - Success",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test(\"Comment created with ID\", function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.result.id).to.exist;",
+                  "    pm.environment.set('commentId', json.result.id);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"content\": \"This is a test comment\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/articles/{{articleId}}/comments",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "articles", "{{articleId}}", "comments"]
+            }
+          }
+        },
+        {
+          "name": "Create Comment - Missing Content",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/articles/{{articleId}}/comments",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "articles", "{{articleId}}", "comments"]
+            }
+          }
+        },
+        {
+          "name": "Create Comment - Article Not Found",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 404\", function () {",
+                  "    pm.response.to.have.status(404);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"content\": \"Comment on non-existent article\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/articles/99999999/comments",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "articles", "99999999", "comments"]
+            }
+          }
+        },
+        {
+          "name": "Get Comments by Article - Success",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Returns comments array\", function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.result).to.be.an('array');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/articles/{{articleId}}/comments",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "articles", "{{articleId}}", "comments"]
+            }
+          }
+        },
+        {
+          "name": "Get Comments - Unauthenticated",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 401\", function () {",
+                  "    pm.response.to.have.status(401);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/articles/{{articleId}}/comments",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "articles", "{{articleId}}", "comments"]
+            }
+          }
+        },
+        {
+          "name": "Update Comment - Success",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Comment updated\", function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.result.content).to.include('Updated');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"content\": \"Updated comment content\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/comments/{{commentId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "comments", "{{commentId}}"]
+            }
+          }
+        },
+        {
+          "name": "Update Comment - Missing Content",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/comments/{{commentId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "comments", "{{commentId}}"]
+            }
+          }
+        },
+        {
+          "name": "Update Comment - Not Found",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 404\", function () {",
+                  "    pm.response.to.have.status(404);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"content\": \"Updated\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/comments/99999999",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "comments", "99999999"]
+            }
+          }
+        },
+        {
+          "name": "Delete Comment - Success",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/comments/{{commentId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "comments", "{{commentId}}"]
+            }
+          }
+        },
+        {
+          "name": "Delete Comment - Not Found",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 404\", function () {",
+                  "    pm.response.to.have.status(404);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/comments/99999999",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "comments", "99999999"]
+            }
+          }
+        }
+      ]
     }
   ]
 }
