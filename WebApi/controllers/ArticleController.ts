@@ -1,10 +1,10 @@
 
 import type { Request, Response, NextFunction } from "express";
 import { sendApiResponse } from '@webapi/utils/response';
-import { ArticleService } from "@app/services/Article/ArticleService.ts";
-import { UnauthorizedError } from "@domain/errors/index.ts";
-import { validateRequiredFields } from "@webapi/utils/validation.ts";
-import { BadRequestError } from "@domain/errors/index.ts";
+import { ArticleService } from "@app/services/Article/ArticleService";
+import { UnauthorizedError } from "@domain/errors/index";
+import { validateRequiredFields } from "@webapi/utils/validation";
+import { BadRequestError } from "@domain/errors/index";
 
 export class ArticleController {
   private articleService: ArticleService;
@@ -20,8 +20,6 @@ export class ArticleController {
       const search = (req.query.q as string) || "";
       const page = parseInt(pageRaw);
       const limit = parseInt(limitRaw);
-
-      console.log("Search params - page:", page, "limit:", limit, "search:", search);
 
       if ((pageRaw !== undefined && isNaN(page)) || (limitRaw !== undefined && isNaN(limit))) {
         throw new BadRequestError("Paramètres de pagination non numériques");
@@ -57,6 +55,7 @@ export class ArticleController {
 
   async create(req: Request, res: Response, next: NextFunction) {
     try {
+      console.log("Creating article, req.user:", req.user);
       const authorId = req.user?.id;
       if (!authorId) {
         throw new UnauthorizedError("Utilisateur non authentifié");

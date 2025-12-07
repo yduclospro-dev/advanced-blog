@@ -1,9 +1,7 @@
 
 import type { ICommentRepository } from '@domain/repositories/ICommentRepository';
-import { PrismaClient } from '@prisma/client';
 import type { Comment } from '@domain/entities/Comment';
-
-const prisma = new PrismaClient();
+import { prisma } from "@infra/prismaClient";
 
 export class CommentRepository implements ICommentRepository {
   async create(data: Partial<Comment>): Promise<Comment> {

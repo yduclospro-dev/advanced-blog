@@ -64,6 +64,7 @@ export class UserController {
       const refreshSecret = process.env.JWT_SECRET;
       if (!refreshSecret) throw new Error('JWT_SECRET non défini');
      
+      console.log("Secret utilisé pour SIGNER :", process.env.JWT_SECRET);
       const refreshToken = jwt.sign({ userId: user.id, email: user.email, role: user.role }, refreshSecret, { expiresIn: 7 * 24 * 60 * 60 });
 
       res.cookie('refresh_token', refreshToken, {

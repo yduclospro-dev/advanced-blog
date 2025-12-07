@@ -1,4 +1,4 @@
-import { Article } from "@domain/entities/Article.ts";
+import { Article } from "@domain/entities/Article";
 
 export interface IArticleRepository {
   create(article: Article): Promise<Article>;

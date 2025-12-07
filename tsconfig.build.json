@@ -1,0 +1,26 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "allowImportingTsExtensions": false,
+    "noEmit": false,
+    "outDir": "dist",
+    "module": "CommonJS",
+    "moduleResolution": "node",
+    "target": "ES2020",
+
+    "baseUrl": ".",
+    "paths": {
+      "@app/*": ["Application/*"],
+      "@domain/*": ["Domain/*"],
+      "@infra/*": ["Infrastructure/*"],
+      "@webapi/*": ["WebApi/*"],
+      "@root/*": ["*"]
+    },
+
+    "lib": ["ES2020"]
+  },
+  "exclude": [
+    "tests",
+    "node_modules"
+  ]
+}

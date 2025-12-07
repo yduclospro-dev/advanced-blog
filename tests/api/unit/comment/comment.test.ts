@@ -1,8 +1,14 @@
+import "@root/loadEnv";
 import request from 'supertest';
-import { app } from '../../../../WebApi/server';
+import { createApp } from '@webapi/server';
 
 describe('Commentaires API', () => {
+  let app: ReturnType<typeof createApp>;
   describe('POST /api/articles/:articleId/comments', () => {
+    beforeAll(() => {
+      app = createApp();
+    });
+
     it('should create a comment when authenticated', async () => {
       // TODO: mock authentication and article
       const articleId = 'dummy-article-id';

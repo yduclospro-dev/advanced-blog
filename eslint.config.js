@@ -6,7 +6,6 @@ export default [
     ignores: [
       "out/**",
       "build/**",
-      "tests/jest.back.cjs",
       "tests/jest.config.cjs"
     ],
   },

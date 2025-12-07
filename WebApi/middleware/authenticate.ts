@@ -1,55 +1,34 @@
+import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
-import type { Response, NextFunction, Request } from 'express';
-import { UserRole } from '@prisma/client';
-import { sendApiResponse } from '@webapi/utils/response';
-import { log } from 'node:console';
-
-const JWT_SECRET = process.env.JWT_SECRET;
-
-if (!JWT_SECRET) {
-  throw new Error('JWT_SECRET n\'est pas défini dans les variables d\'environnement');
-}
 
 export function authenticate(req: Request, res: Response, next: NextFunction) {
+  const secret = process.env.JWT_SECRET;
 
-    log("cookies:", req.cookies);
-    let token: string | undefined;
-    const authHeader = req.headers.authorization;
-    if (authHeader && authHeader.startsWith('Bearer ')) {
-        token = authHeader.substring(7);
-    } else if (req.cookies && req.cookies.refresh_token) {
-        token = req.cookies.refresh_token;
-    }
+  if (!secret) {
+    // En test, on NE DOIT PAS planter l'appli…
+    // mais on doit renvoyer une erreur claire.
+    console.error("JWT_SECRET non défini");
+    return res.status(500).json({ error: "Erreur serveur : secret JWT manquant" });
+  }
 
-    if (!token) {
-        return sendApiResponse(res, {
-            success: false,
-            message: 'Token manquant ou invalide',
-            result: null,
-            statusCode: 401
-        });
-    }
+  console.log("secret JWT is set: ", secret);
+  console.log("Authenticating request...");
+  console.log("header:", req.headers);
 
-    try {
-        const decoded = jwt.verify(token, JWT_SECRET) as {
-            userId: string;
-            email: string;
-            role: UserRole;
-        };
+  const auth = req.headers.authorization;
+  if (!auth) {
+    console.error("Token manquant dans l'en-tête Authorization");
+    return res.status(401).json({ error: "Token manquant" });
+  }
 
-        req.user = {
-            id: decoded.userId,
-            email: decoded.email,
-            role: decoded.role
-        };
+  const token = auth.split(" ")[1];
 
-        next();
-    } catch {
-        return sendApiResponse(res, {
-            success: false,
-            message: 'Token invalide ou expiré',
-            result: null,
-            statusCode: 401
-        });
-    }
+  try {
+    const payload = jwt.verify(token, secret);
+    // @ts-expect-error
+    req.user = payload;
+    next();
+  } catch {
+    return res.status(401).json({ error: "Token invalide" });
+  }
 }

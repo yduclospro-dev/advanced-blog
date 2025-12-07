@@ -1,23 +1,29 @@
-import { PrismaClient } from "@prisma/client";
+import "@root/loadEnv";
 import { Router } from "express";
-import { UserController } from "@webapi/controllers/UserController.ts";
-import { ArticleController } from "@webapi/controllers/ArticleController.ts";
-import { ImageController, upload } from "@webapi/controllers/ImageController.ts";
-import { userService, articleService, imageUploadService, commentService, passwordResetService, emailService } from "@root/compositionRoot.ts";
+import { UserController } from "@webapi/controllers/UserController";
+import { ArticleController } from "@webapi/controllers/ArticleController";
+import { ImageController, upload } from "@webapi/controllers/ImageController";
+import { createCompositionRoot } from "@root/compositionRoot";
 import { CommentController } from "@webapi/controllers/CommentController";
-import { authenticate } from "@webapi/middleware/authenticate.ts";
-import { ensureNotAuthenticated } from "@webapi/middleware/ensureNotAuthenticated.ts";
+import { authenticate } from "@webapi/middleware/authenticate";
+import { ensureNotAuthenticated } from "@webapi/middleware/ensureNotAuthenticated";
 import { PasswordResetController } from "@webapi/controllers/PasswordResetController";
 
 const apiRouter = Router();
+
+const { 
+    userService, 
+    articleService, 
+    imageUploadService, 
+    commentService, 
+    passwordResetService, 
+    emailService } = createCompositionRoot();
 
 const commentController = new CommentController(commentService);
 const userController = new UserController(userService);
 const articleController = new ArticleController(articleService);
 const imageController = new ImageController(imageUploadService);
 const passwordResetController = new PasswordResetController(passwordResetService, emailService);
-
-
 
 apiRouter.post('/register', userController.register.bind(userController));
 apiRouter.post('/login', userController.login.bind(userController));

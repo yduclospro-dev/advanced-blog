@@ -2,7 +2,7 @@ import type { IArticleRepository } from "@domain/repositories/IArticleRepository
 import { DisplayArticleDto } from "@app/dtos/Article/DisplayArticleDto";
 import { CreateArticleDto } from "@app/dtos/Article/CreateArticleDto";
 import { UserRole } from "@prisma/client";
-import { isOwnerOrAdmin } from "@domain/utils/permissions.ts";
+import { isOwnerOrAdmin } from "@domain/utils/permissions";
 import { BadRequestError, NotFoundError, ForbiddenError } from "@domain/errors";
 import { Article } from "@domain/entities/Article";
 

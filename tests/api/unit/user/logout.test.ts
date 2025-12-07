@@ -1,14 +1,18 @@
+import "@root/loadEnv";
 import request from 'supertest';
-import { app } from '@webapi/server';
+import { createApp } from '@webapi/server';
 
 function unique(prefix: string) {
   return `${prefix}_${Date.now().toString(36)}_${Math.random().toString(36).slice(2,8)}`;
 }
 
 describe('POST /api/logout', () => {
+  let app: ReturnType<typeof createApp>;
   let refreshToken: string;
 
   beforeAll(async () => {
+    app = createApp();
+
     const name = unique('logoutuser');
     const email = `${name}@example.com`;
     await request(app)
@@ -31,6 +35,6 @@ describe('POST /api/logout', () => {
     const res = await request(app)
       .post('/api/logout')
       .send({ refreshToken: 'invalidtoken' });
-    expect([200, 204]).toContain(res.status); // logout route is idempotent
+    expect([200, 204]).toContain(res.status);
   });
 });
