@@ -243,7 +243,6 @@ export function createApp() {
       }
     };
 
-    // Database check
     try {
       const dbStart = Date.now();
       await prisma.$queryRaw`SELECT 1`;
@@ -259,7 +258,6 @@ export function createApp() {
       };
     }
 
-    // Redis check
     try {
       const redisStart = Date.now();
       const redisClient = getRedisClient();
@@ -283,7 +281,6 @@ export function createApp() {
       };
     }
 
-    // Memory check
     const memUsage = process.memoryUsage();
     checks.checks.memory = {
       status: 'healthy',
@@ -311,7 +308,6 @@ export function createApp() {
     res.send(swaggerSpec);
   });
 
-  // Bull Board monitoring dashboard
   try {
     app.use('/admin/queues', serverAdapter.getRouter());
   } catch (error) {
@@ -324,7 +320,7 @@ export function createApp() {
   return app;
 }
 
-if (!process.env.JEST_WORKER_ID) {
+if (process.env.NODE_ENV === "development") {
   const app = createApp();
   app.listen(port, '0.0.0.0', () => {
     console.log(`Server ready on http://localhost:${port}`);

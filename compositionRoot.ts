@@ -8,7 +8,6 @@ import { CommentService } from "@app/services/Comment/CommentService";
 import { PasswordResetService } from "@app/services/User/PasswordResetService";
 import { AuthRateLimitService } from "@infra/services/AuthRateLimitService";
 
-// Initialize queues to start workers (only in non-test environment)
 if (process.env.NODE_ENV !== "test" && !process.env.TEST_IN_DOCKER) {
   import("@infra/queues")
     .then(() => console.log("✅ Queue workers initialized"))

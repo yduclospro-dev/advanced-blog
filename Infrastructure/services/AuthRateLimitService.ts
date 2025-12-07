@@ -30,19 +30,16 @@ export class AuthRateLimitService {
     const { base, block } = this.buildKeys(email);
 
     const isBlocked = await this.redis.get(block);
-    console.log(`[Rate Limit] Email: ${email}, Blocked: ${isBlocked}`);
     if (isBlocked) {
       throw new TooManyLoginAttemptsError();
     }
 
     const attempts = await this.redis.incr(base);
-    console.log(`[Rate Limit] Email: ${email}, Attempts: ${attempts}/${this.maxAttempts}`);
     if (attempts === 1) {
       await this.redis.expire(base, this.windowSeconds);
     }
 
     if (attempts >= this.maxAttempts) {
-      console.log(`[Rate Limit] Blocking ${email} for ${this.blockSeconds}s`);
       await this.redis.set(block, '1', { EX: this.blockSeconds });
       await this.redis.del(base);
       throw new TooManyLoginAttemptsError();

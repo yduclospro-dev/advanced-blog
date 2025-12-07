@@ -3,7 +3,6 @@ import { BullAdapter } from "@bull-board/api/bullAdapter";
 import { ExpressAdapter } from "@bull-board/express";
 import { emailQueue } from "./queueConfig";
 
-// Create Bull Board UI
 const serverAdapter = new ExpressAdapter();
 serverAdapter.setBasePath("/admin/queues");
 
