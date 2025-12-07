@@ -8,24 +8,6 @@ jest.mock('@/components/ClientOnly', () => ({
 	default: ({ children }: { children: React.ReactNode }) => children
 }));
 
-jest.mock('@infra/redisClient', () => {
-  const redisClientMock = {
-	get: jest.fn(),
-	incr: jest.fn(),
-	expire: jest.fn(),
-	set: jest.fn(),
-	del: jest.fn(),
-  };
-
-  (redisClientMock.get as jest.Mock).mockResolvedValue(null);
-  (redisClientMock.incr as jest.Mock).mockResolvedValue(1);
-
-  return {
-	__esModule: true,
-	redisClient: redisClientMock,
-  };
-});
-
 jest.mock("resend", () => {
   return {
     Resend: jest.fn().mockImplementation(() => ({
