@@ -22,7 +22,9 @@ export function createApp() {
       directives: {
         defaultSrc: ["'self'"],
         styleSrc: ["'self'", "'unsafe-inline'"],
-        scriptSrc: ["'self'", "'unsafe-inline'"],
+        scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
+        connectSrc: ["'self'"],
+        imgSrc: ["'self'", "data:", "https:"],
       },
     },
   }));
