@@ -1,4 +1,3 @@
-import "@root/loadEnv";
 import { prisma } from "@infra/prismaClient";
 import express from "express";
 import cors from "cors";
