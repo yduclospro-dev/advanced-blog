@@ -1,8 +1,7 @@
-import type { IArticleRepository } from '@domain/repositories/IArticleRepository.ts';
-import { Article } from '@domain/entities/Article.ts';
-import { PrismaClient, Prisma } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import type { IArticleRepository } from '@domain/repositories/IArticleRepository';
+import { Article } from '@domain/entities/Article';
+import { Prisma } from '@prisma/client';
+import { prisma } from "@infra/prismaClient"
 
 export class ArticleRepository implements IArticleRepository {
   async create(article: Article): Promise<Article> {
@@ -40,7 +39,7 @@ export class ArticleRepository implements IArticleRepository {
     });
 
     return articles.map(
-      (a) =>
+      (a : any) =>
         new Article(
           a.title,
           a.user.userName,
@@ -127,7 +126,7 @@ export class ArticleRepository implements IArticleRepository {
     ]);
     return {
       articles: articles.map(
-        (a) =>
+        (a: any) =>
           new Article(
             a.title,
             a.user.userName,

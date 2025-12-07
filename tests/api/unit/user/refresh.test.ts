@@ -1,16 +1,20 @@
+import "@root/loadEnv";
 import request from 'supertest';
-import { app } from '@webapi/server';
+import { createApp } from '@webapi/server';
 
 function unique(prefix: string) {
   return `${prefix}_${Date.now().toString(36)}_${Math.random().toString(36).slice(2,8)}`;
 }
-
+  
 describe('POST /api/refresh', () => {
+  let app: ReturnType<typeof createApp>;
   let refreshToken: string;
 
   beforeAll(async () => {
+    app = createApp();
     const name = unique('refreshuser');
     const email = `${name}@example.com`;
+
     await request(app)
       .post('/api/register')
       .send({ userName: name, email, password: 'password123' });

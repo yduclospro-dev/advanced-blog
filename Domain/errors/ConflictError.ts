@@ -1,4 +1,4 @@
-import { HttpError } from '@domain/errors/HttpError.ts';
+import { HttpError } from '@domain/errors/HttpError';
 
 export class ConflictError extends HttpError {
   constructor(message: string = 'Conflit avec une ressource existante') {

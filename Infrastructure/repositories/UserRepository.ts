@@ -1,9 +1,7 @@
-import type { IUserRepository } from '@domain/repositories/IUserRepository.ts';
-import { User } from '@domain/entities/User.ts';
-import { PrismaClient } from '@prisma/client';
+import type { IUserRepository } from '@domain/repositories/IUserRepository';
+import { User } from '@domain/entities/User';
+import { prisma } from "@infra/prismaClient"
 
-
-const prisma = new PrismaClient();
 export class UserRepository implements IUserRepository {
 
   async updatePassword(userId: string, hashedPassword: string): Promise<void> {
@@ -50,6 +48,6 @@ export class UserRepository implements IUserRepository {
 
   async getAll(): Promise<User[]> {
     const users = await prisma.user.findMany();
-    return users.map(u => new User(u.userName, u.email, u.password, u.role, u.id));
+    return users.map((u: any) => new User(u.userName, u.email, u.password, u.role, u.id));
   }
 }

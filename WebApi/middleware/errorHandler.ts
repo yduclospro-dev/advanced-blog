@@ -17,6 +17,8 @@ export function errorHandler(
     });
   }
 
+  console.error('Unhandled error:', error); // Log the error for debugging
+
   void next;
 
   return sendApiResponse(res, {

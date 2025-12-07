@@ -1,41 +1,18 @@
+import "@root/loadEnv";
 import request from 'supertest';
-import { app } from '@webapi/server';
-import { redisClient } from '@infra/redisClient';
-
-jest.mock('@infra/redisClient', () => {
-  const redisClientMock = {
-    get: jest.fn(),
-    incr: jest.fn(),
-    expire: jest.fn(),
-    set: jest.fn(),
-    del: jest.fn(),
-  };
-
-  // valeurs par défaut
-  (redisClientMock.get as jest.Mock).mockResolvedValue(null);
-  (redisClientMock.incr as jest.Mock).mockResolvedValue(1);
-
-  return {
-    __esModule: true,
-    redisClient: redisClientMock,
-  };
-});
+import { createApp } from '@webapi/server';
 
 function unique(prefix: string) {
   return `${prefix}_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
 }
 
 describe('POST /api/login', () => {
+  let app: ReturnType<typeof createApp>;
   const name = unique('loginuser');
   const email = `${name}@example.com`;
 
   beforeAll(async () => {
-    // Sanity check : on vérifie que c’est BIEN un mock
-    // (tu peux laisser ça le temps de débug)
-    // @ts-ignore
-    console.log('typeof redisClient.get =', typeof redisClient.get);
-    // @ts-ignore
-    console.log('isMock?', jest.isMockFunction(redisClient.get));
+    app = createApp();
 
     await request(app)
       .post('/api/register')

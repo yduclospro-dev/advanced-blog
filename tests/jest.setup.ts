@@ -1,4 +1,7 @@
 import "@testing-library/jest-dom";
+import dotenv from "dotenv";
+
+dotenv.config({ path: ".env.test" });
 
 // Render ClientOnly children synchronously in tests to avoid the fallback 'Chargement...' UI
 jest.mock('@/components/ClientOnly', () => ({
@@ -22,6 +25,14 @@ jest.mock('@infra/redisClient', () => {
   return {
 	__esModule: true,
 	redisClient: redisClientMock,
+  };
+});
+
+jest.mock("resend", () => {
+  return {
+    Resend: jest.fn().mockImplementation(() => ({
+      emails: { send: jest.fn() }
+    }))
   };
 });
 
