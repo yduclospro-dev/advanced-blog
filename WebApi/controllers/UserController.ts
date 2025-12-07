@@ -3,9 +3,10 @@ import { sendApiResponse } from '@webapi/utils/response';
 import jwt from "jsonwebtoken";
 import { UserService } from "@app/services/User/UserService";
 import type { UserDto } from '@app/dtos/User/UserDto';
-import { UnauthorizedError, NotFoundError } from "@domain/errors";
+import { UnauthorizedError, NotFoundError, ForbiddenError } from "@domain/errors";
 import { validateRequiredFields } from "@webapi/utils/validation";
 import { AuthRateLimitService } from '../../Infrastructure/services/AuthRateLimitService';
+import { isAdmin } from "@domain/utils/permissions";
 
 export class UserController {
   private userService: UserService;
