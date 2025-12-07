@@ -19,7 +19,7 @@ const {
     passwordResetService, 
     emailService } = createCompositionRoot();
 
-const commentController = new CommentController(commentService);
+const commentController = new CommentController(commentService, articleService);
 const userController = new UserController(userService);
 const articleController = new ArticleController(articleService);
 const imageController = new ImageController(imageUploadService);
