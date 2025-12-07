@@ -10,51 +10,60 @@ jobs:
     runs-on: ubuntu-latest
 
     services:
-      db:
-        image: postgres:15
+      postgres:
+        image: postgres:16
         env:
           POSTGRES_USER: test
           POSTGRES_PASSWORD: test
-          POSTGRES_DB: advanced_blog_test
+          POSTGRES_DB: testdb
         ports:
-          - 5434:5432
+          - 5433:5432
         options: >-
           --health-cmd="pg_isready -U test"
           --health-interval=5s
           --health-timeout=5s
           --health-retries=10
 
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd="redis-cli ping"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=10
+
     steps:
-      - name: Checkout du code
-        uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v4
 
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '22'
+          cache: 'npm'
 
-      - name: Installer les dépendances
-        run: npm install
+      - name: Install dependencies
+        run: npm ci
 
-      - name: Générer Prisma
+      - name: Generate Prisma Client
         env: 
-            DATABASE_URL: "postgresql://test:test@localhost:5434/advanced_blog_test?schema=public"
+            DATABASE_URL: "postgresql://test:test@localhost:5433/testdb?schema=public"
         run: npx prisma generate
 
-      - name: Attendre que PostgreSQL soit prêt (sécurité)
-        run: |
-          for i in {1..20}; do
-            nc -z localhost 5434 && echo "DB OK" && break
-            echo "DB pas prête... tentative $i"
-            sleep 2
-          done
+      - name: Run database migrations
+        env:
+          DATABASE_URL: "postgresql://test:test@localhost:5433/testdb?schema=public"
+        run: npx prisma migrate deploy
 
-      - name: Linter (ESLint)
+      - name: Run linter
         run: npm run lint
 
-      - name: Lancer les tests
+      - name: Run tests
         env:
-          DATABASE_URL: "postgresql://test:test@localhost:5434/advanced_blog_test?schema=public"
+          DATABASE_URL: "postgresql://test:test@localhost:5433/testdb?schema=public"
+          REDIS_URL: "redis://localhost:6379"
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
           RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
-        run: npm run test
+        run: npm test

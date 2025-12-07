@@ -5,13 +5,13 @@ import { validateRequiredFields } from "@webapi/utils/validation";
 import { Request, Response, NextFunction } from 'express';
 import type { CreateCommentDto, UpdateCommentDto } from '@app/dtos/Comment/CommentDto';
 import { CommentService } from "@app/services/Comment/CommentService";
-import { articleService } from '../../compositionRoot';
+import { ArticleService } from "@app/services/Article/ArticleService";
 
 export class CommentController {
-  private articleService;
-  private commentService;
+  private articleService: ArticleService;
+  private commentService: CommentService;
 
-  constructor(commentService: CommentService) {
+  constructor(commentService: CommentService, articleService: ArticleService) {
     this.articleService = articleService;
     this.commentService = commentService;
   }
@@ -21,7 +21,7 @@ export class CommentController {
       validateRequiredFields(req.body, ["content"]);
       const articleId = req.params.articleId;
 
-      var article = await articleService.findById(articleId);
+      var article = await this.articleService.findById(articleId);
       if (!article) {
         throw new NotFoundError('Article non trouvé');
       }
@@ -45,7 +45,7 @@ export class CommentController {
   async getCommentsByArticle(req: Request, res: Response, next: NextFunction) {
     try {
       const articleId = req.params.articleId;
-      var article = await articleService.findById(articleId);
+      var article = await this.articleService.findById(articleId);
       if (!article) {
         throw new NotFoundError('Article non trouvé');
       }
