@@ -7,7 +7,7 @@
     "postinstall": "prisma generate",
     "dev": "tsx scripts/redis-start.ts && tsx -r tsconfig-paths/register WebApi/server.ts",
     "build": "prisma generate && tsc -p tsconfig.build.json",
-    "start": "node -r tsconfig-paths/register dist/WebApi/server.js",
+    "start": "node --import=tsx/esm dist/WebApi/server.js",
     "lint": "eslint .",
     "seed": "prisma db seed",
     "pretest": "docker stop redis-dev || echo Redis dev not running",
