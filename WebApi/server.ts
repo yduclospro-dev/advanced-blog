@@ -1,4 +1,3 @@
-import { prisma } from "@infra/prismaClient";
 import express from "express";
 import cors from "cors";
 import helmet from "helmet";
@@ -30,7 +29,6 @@ export function createApp() {
 
   app.get('/healthz', async (req, res) => {
     try {
-      await prisma.user.count();
       res.send("OK");
     } catch {
       res.status(500).send("ERROR");
