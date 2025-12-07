@@ -20,5 +20,8 @@ export default {
         useESM: true
       }
     ]
-  }
+  },
+
+  globalTeardown: './tests/globalTeardown.ts',
+  forceExit: true
 };
