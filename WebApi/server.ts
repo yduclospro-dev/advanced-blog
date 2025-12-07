@@ -43,7 +43,7 @@ export function createApp() {
 
 if (!process.env.JEST_WORKER_ID) {
   const app = createApp();
-  app.listen(port, () => {
+  app.listen(port, '0.0.0.0', () => {
     console.log(`Server ready on http://localhost:${port}`);
   });
 }
