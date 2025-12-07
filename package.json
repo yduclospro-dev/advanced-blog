@@ -2,7 +2,6 @@
   "name": "advanced-blog",
   "version": "0.1.0",
   "private": true,
-  "type": "module",
   "scripts": {
     "postinstall": "prisma generate",
     "dev": "tsx scripts/redis-start.ts && tsx -r tsconfig-paths/register WebApi/server.ts",
